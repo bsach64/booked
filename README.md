@@ -9,3 +9,5 @@ Thursday
 - [ ] Auth and user table setup
 - [ ] create make file
 - [x] air toml
+- [ ] Register User
+- [ ] Implement Login
