@@ -3,10 +3,10 @@ package errordom
 import "fmt"
 
 type AppError struct {
-	Category     ErrorCategory
-	CategoryCode ErrorCategoryCode
-	ErrorToWrap  error
-	Msg          string
+	Category     ErrorCategory     `json:"category"`
+	CategoryCode ErrorCategoryCode `json:"category_code"`
+	ErrorToWrap  error             `json:"error"`
+	Msg          string            `json:"msg"`
 }
 
 func (ae *AppError) Error() string {

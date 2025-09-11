@@ -17,11 +17,18 @@ Thursday
 - [x] Migrations with goose
 - [x] logging (just using golang's logging package for now)
 - [x] user table setup
-- [ ] Auth
-- [ ] create make file (not happening)
 - [x] air toml
-- [ ] Register User
-- [ ] Implement Login
 - [x] user repo
 - [x] error domain
 - [x] we are not doing payments
+- [x] utils for http delivery layer
+
+Friday
+- [ ] Download postman
+- [ ] http delivery layer
+- [ ] Register User
+- [ ] Implement Login
+- [ ] Auth
+- [ ] create make file (not happening)
+- [ ] Figure out most of the user features
+- [x] Setup Health router
