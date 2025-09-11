@@ -4,13 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
 	"github.com/bsach64/booked/internal/repo/sql/db"
+	userrepo "github.com/bsach64/booked/internal/repo/user"
+	useruc "github.com/bsach64/booked/internal/usecase/user"
 	_ "github.com/lib/pq"
 
 	"github.com/bsach64/booked/utils"
 )
 
 func main() {
+	// minimum to test everything
 	ctx := context.Background()
 	config, err := utils.GetConfig()
 	if err != nil {
@@ -18,14 +22,26 @@ func main() {
 		return
 	}
 
-	fmt.Print("dbURI ", config.DBUri)
 	dbCon, err := sql.Open("postgres", config.DBUri)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	queries := db.New(dbCon)
+	dbConn := db.New(dbCon)
+	userRepo := userrepo.New(config, dbConn)
+	userUsecase := useruc.New(config, userRepo)
 
-	fmt.Println(queries.GetAllUsers(ctx))
+	// err = userUsecase.CreateUser(ctx, userdom.User{
+	// 	Name:           "Bhavik Sachdev",
+	// 	Email:          "b.sachdev1904@gmail.com",
+	// 	HashedPassword: "1234",
+	// 	Role:           userdom.USER,
+	// })
+	user, err := userUsecase.GetUserByEmail(ctx, "b.sachdev1904@gmail.com")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(user)
 }

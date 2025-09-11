@@ -55,11 +55,11 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 }
 
 type User struct {
-	ID        uuid.UUID
-	Name      string
-	Password  string
-	Email     string
-	Role      UserRole
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID             uuid.UUID
+	Name           string
+	HashedPassword string
+	Email          string
+	Role           UserRole
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }

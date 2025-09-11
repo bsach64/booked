@@ -4,7 +4,7 @@ CREATE TYPE user_role AS ENUM ('admin', 'user');
 CREATE TABLE users (
 	id UUID PRIMARY KEY,
 	name TEXT NOT NULL,
-	password TEXT NOT NULL, -- should be hashed
+	hashed_password TEXT NOT NULL,
 	email TEXT NOT NULL UNIQUE,
 	role user_role NOT NULL DEFAULT 'user',
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
