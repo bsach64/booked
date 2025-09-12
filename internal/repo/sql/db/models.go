@@ -5,12 +5,10 @@
 package db
 
 import (
-	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"time"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type TicketStatus string
@@ -98,32 +96,32 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 }
 
 type Event struct {
-	ID          uuid.UUID
+	ID          pgtype.UUID
 	Name        string
-	Time        time.Time
+	Time        pgtype.Timestamp
 	Address     string
 	Description string
-	Latitude    sql.NullFloat64
-	Longitude   sql.NullFloat64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Latitude    pgtype.Float8
+	Longitude   pgtype.Float8
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
 }
 
 type Ticket struct {
-	ID        uuid.UUID
-	UserID    uuid.NullUUID
-	EventID   uuid.UUID
+	ID        pgtype.UUID
+	UserID    pgtype.UUID
+	EventID   pgtype.UUID
 	Status    TicketStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }
 
 type User struct {
-	ID             uuid.UUID
+	ID             pgtype.UUID
 	Name           string
 	HashedPassword string
 	Email          string
 	Role           UserRole
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
 }

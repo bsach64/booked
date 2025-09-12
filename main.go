@@ -1,32 +1,34 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"log"
 
 	httpdelivery "github.com/bsach64/booked/delivery/http"
 	"github.com/bsach64/booked/internal/repo"
 	"github.com/bsach64/booked/internal/repo/sql/db"
 	"github.com/bsach64/booked/internal/usecase"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
 	"github.com/bsach64/booked/utils"
 )
 
 func main() {
+	ctx := context.Background()
 	config, err := utils.GetConfig()
 	if err != nil {
 		log.Fatalf("could not get config err=%v\n", err)
 		return
 	}
 
-	dbCon, err := sql.Open("postgres", config.DBUri)
+	pool, err := pgxpool.New(ctx, config.DBUri)
 	if err != nil {
 		log.Fatalf("could not establish connection to db err=%v\n", err)
 		return
 	}
 
-	dbQueries := db.New(dbCon)
+	dbQueries := db.New(pool)
 	repositories := repo.New(config, dbQueries)
 	usecases := usecase.New(config, repositories)
 	server := httpdelivery.New(config, usecases, repositories)

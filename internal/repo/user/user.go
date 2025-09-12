@@ -9,6 +9,8 @@ import (
 	"github.com/bsach64/booked/internal/repo/sql/db"
 	"github.com/bsach64/booked/utils"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type impl struct {
@@ -18,7 +20,7 @@ type impl struct {
 
 func (i *impl) CreateUser(ctx context.Context, user userdom.User) error {
 	createUserParams := db.CreateUserParams{
-		ID:             uuid.New(),
+		ID:             pgtype.UUID{Bytes: uuid.New(), Valid: true},
 		Name:           user.Name,
 		Email:          user.Email,
 		HashedPassword: user.HashedPassword,
@@ -39,7 +41,7 @@ func (i *impl) CreateUser(ctx context.Context, user userdom.User) error {
 func (i *impl) GetUserByEmail(ctx context.Context, email string) (*userdom.User, error) {
 	dbUser, err := i.dbConn.GetUserByEmail(ctx, email)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == sql.ErrNoRows || err == pgx.ErrNoRows {
 			return nil, nil
 		}
 		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)

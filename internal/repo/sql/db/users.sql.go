@@ -8,7 +8,7 @@ package db
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :exec
@@ -20,7 +20,7 @@ INSERT INTO users (
 `
 
 type CreateUserParams struct {
-	ID             uuid.UUID
+	ID             pgtype.UUID
 	Name           string
 	HashedPassword string
 	Email          string
@@ -28,7 +28,7 @@ type CreateUserParams struct {
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser,
+	_, err := q.db.Exec(ctx, createUser,
 		arg.ID,
 		arg.Name,
 		arg.HashedPassword,
@@ -43,7 +43,7 @@ SELECT id, name, hashed_password, email, role, created_at, updated_at FROM users
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
