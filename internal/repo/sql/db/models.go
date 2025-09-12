@@ -5,12 +5,55 @@
 package db
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type TicketStatus string
+
+const (
+	TicketStatusAvailiable TicketStatus = "availiable"
+	TicketStatusBooked     TicketStatus = "booked"
+)
+
+func (e *TicketStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TicketStatus(s)
+	case string:
+		*e = TicketStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TicketStatus: %T", src)
+	}
+	return nil
+}
+
+type NullTicketStatus struct {
+	TicketStatus TicketStatus
+	Valid        bool // Valid is true if TicketStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTicketStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.TicketStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TicketStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTicketStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TicketStatus), nil
+}
 
 type UserRole string
 
@@ -52,6 +95,27 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.UserRole), nil
+}
+
+type Event struct {
+	ID          uuid.UUID
+	Name        string
+	Time        time.Time
+	Address     string
+	Description string
+	Latitude    sql.NullFloat64
+	Longitute   sql.NullFloat64
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type Ticket struct {
+	ID        uuid.UUID
+	UserID    uuid.NullUUID
+	EventID   uuid.UUID
+	Status    TicketStatus
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type User struct {

@@ -10,6 +10,32 @@ Problem Statement
         Create, update, and manage events.
         View booking analytics (total bookings, most popular events, capacity utilization).
 
+**Functional Requirements**
+
+Users should be able to:
+- Browse of a list of upcoming events
+- Book tickets
+- Cancel tickets
+
+Admin Features:
+- CRUD Events
+- Analytics
+
+Non Functional Requirements
+
+- CAP Theorem
+    - Consistency >> Availiability
+    - Strong Consistency for tickets & high availiability for viewing events
+
+- Reads >> Write
+- scalability to handle popular events
+
+**Core Entities**
+- Users
+- Admins
+- Events
+- Tickets
+
 Thursday
 - [x] postgres DB config
 - [x] generate sql files with sqlc
@@ -24,13 +50,15 @@ Thursday
 - [x] utils for http delivery layer
 
 Friday
-- [ ] Download postman
+- [x] Download postman
 - [x] http delivery layer
 - [x] Figure out middlewares
 - [x] Register User
 - [x] Implement Login
 - [ ] Implement Logout (maybe later)
 - [ ] create make file (not happening)
-- [ ] Figure out most of the user features
 - [x] Setup Health router
 - [x] Logging
+- [ ] Events Table
+- [ ] Bookings Table
+- [ ] Caching?

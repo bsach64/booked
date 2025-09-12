@@ -1,4 +1,5 @@
 -- +goose Up
+-- +goose StatementBegin
 CREATE TYPE user_role AS ENUM ('admin', 'user');
 
 CREATE TABLE users (
@@ -10,7 +11,10 @@ CREATE TABLE users (
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+-- +goose StatementEnd
 
 -- +goose Down
+-- +goose StatementBegin
 DROP TABLE users;
 DROP TYPE user_role;
+-- +goose StatementEnd
