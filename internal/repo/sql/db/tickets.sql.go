@@ -6,10 +6,36 @@
 package db
 
 import (
+	"context"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type CreateTicketsParams struct {
 	ID      pgtype.UUID
 	EventID pgtype.UUID
+}
+
+const getAvailableTickets = `-- name: GetAvailableTickets :many
+SELECT id FROM tickets WHERE event_id = $1 AND status = 'available'
+`
+
+func (q *Queries) GetAvailableTickets(ctx context.Context, eventID pgtype.UUID) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, getAvailableTickets, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var id pgtype.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

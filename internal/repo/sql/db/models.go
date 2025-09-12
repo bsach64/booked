@@ -14,8 +14,8 @@ import (
 type TicketStatus string
 
 const (
-	TicketStatusAvailiable TicketStatus = "availiable"
-	TicketStatusBooked     TicketStatus = "booked"
+	TicketStatusAvailable TicketStatus = "available"
+	TicketStatusBooked    TicketStatus = "booked"
 )
 
 func (e *TicketStatus) Scan(src interface{}) error {

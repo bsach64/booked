@@ -45,7 +45,7 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 }
 
 const deleteEvent = `-- name: DeleteEvent :one
-DELETE FROM events WHERE id = $1 RETURNING id
+DELETE FROM events CASCADE WHERE id = $1 RETURNING id
 `
 
 func (q *Queries) DeleteEvent(ctx context.Context, id pgtype.UUID) (pgtype.UUID, error) {

@@ -72,4 +72,4 @@ Friday
 - [x] Return Event ID as well
 - [ ] Graceful Shutdown of server
 - [ ] Cleanup error handling (do this at the end)
-- [ ] User in context
+- [x] User in context

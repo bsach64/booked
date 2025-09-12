@@ -10,6 +10,7 @@ import (
 	"github.com/bsach64/booked/internal/usecase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
+	"github.com/valkey-io/valkey-go"
 
 	"github.com/bsach64/booked/utils"
 )
@@ -28,8 +29,15 @@ func main() {
 		return
 	}
 
+	valkeyClient, err := valkey.NewClient(valkey.ClientOption{
+		InitAddress: []string{config.ValkeyURL},
+	})
+	if err != nil {
+		log.Fatalf("could not establish connection to valkey err=%v\n", err)
+	}
+
 	dbQueries := db.New(pool)
-	repositories := repo.New(config, dbQueries)
+	repositories := repo.New(config, dbQueries, valkeyClient)
 	usecases := usecase.New(config, repositories)
 	server := httpdelivery.New(config, usecases, repositories)
 	server.StartServer()

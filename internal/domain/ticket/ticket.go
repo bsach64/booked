@@ -11,8 +11,8 @@ import (
 type Status string
 
 const (
-	BOOKED     Status = "booked"
-	AVAILIABLE Status = "availiable"
+	BOOKED    Status = "booked"
+	AVAILABLE Status = "available"
 )
 
 type Ticket struct {
@@ -24,17 +24,20 @@ type Ticket struct {
 
 type ReserveTicketRequest struct {
 	EventID string `json:"event_id"`
-	UserID  string `json:"user_id"`
 	Count   int    `json:"count"`
 }
 
+type ReserveTicketsResponse struct {
+	TicketIDs []string `json:"ticket_ids"`
+}
+
 type Usecase interface {
-	ReserveTicket(ctx context.Context, eventID uuid.UUID, userEmail string) error
-	BookTicket(ctx context.Context, ticketID uuid.UUID) error
+	ReserveTickets(ctx context.Context, reserveTickets *ReserveTicketRequest) (*ReserveTicketsResponse, error)
+	BookTickets(ctx context.Context, ticketIDs []uuid.UUID) error
 }
 
 type Repository interface {
 	CreateTickets(ctx context.Context, eventID uuid.UUID, count int) error
-	ReserveTicket(ctx context.Context, ticketID uuid.UUID) error
-	BookTicket(ctx context.Context, ticketID uuid.UUID) error
+	ReserveTickets(ctx context.Context, ticketIDs []uuid.UUID) error
+	BookTickets(ctx context.Context, ticketIDs []uuid.UUID) error
 }

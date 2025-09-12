@@ -13,13 +13,13 @@ CREATE TABLE events (
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE ticket_status AS ENUM ('availiable', 'booked');
+CREATE TYPE ticket_status AS ENUM ('available', 'booked');
 
 CREATE TABLE tickets (
 	id UUID PRIMARY KEY,
 	user_id UUID,
 	event_id UUID NOT NULL,
-	status ticket_status NOT NULL DEFAULT 'availiable',
+	status ticket_status NOT NULL DEFAULT 'available',
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
