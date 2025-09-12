@@ -68,6 +68,7 @@ Friday
 - [x] Get Events Paginated
 - [x] Delete Events
 - [ ] Update Events (do this later)
-- [ ] Admin Check
+- [x] Admin Check
 - [x] Return Event ID as well
 - [ ] Graceful Shutdown of server
+- [ ] Cleanup error handling
