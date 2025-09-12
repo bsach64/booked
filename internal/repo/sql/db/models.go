@@ -104,7 +104,7 @@ type Event struct {
 	Address     string
 	Description string
 	Latitude    sql.NullFloat64
-	Longitute   sql.NullFloat64
+	Longitude   sql.NullFloat64
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

@@ -7,7 +7,7 @@ CREATE TABLE events (
 	address TEXT NOT NULL,
 	description TEXT NOT NULL,
 	latitude DOUBLE PRECISION,
-	longitute DOUBLE PRECISION,
+	longitude DOUBLE PRECISION,
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
