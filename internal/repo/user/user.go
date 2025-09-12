@@ -2,6 +2,7 @@ package userrepo
 
 import (
 	"context"
+	"database/sql"
 
 	errordom "github.com/bsach64/booked/internal/domain/error"
 	userdom "github.com/bsach64/booked/internal/domain/user"
@@ -38,6 +39,9 @@ func (i *impl) CreateUser(ctx context.Context, user userdom.User) error {
 func (i *impl) GetUserByEmail(ctx context.Context, email string) (*userdom.User, error) {
 	dbUser, err := i.dbConn.GetUserByEmail(ctx, email)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)
 	}
 	return ToUserDomain(dbUser), nil

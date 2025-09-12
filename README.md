@@ -26,10 +26,11 @@ Thursday
 Friday
 - [ ] Download postman
 - [x] http delivery layer
-- [ ] Figure out middlewares
+- [x] Figure out middlewares
 - [x] Register User
-- [ ] Implement Login
-- [ ] Implement Logout
+- [x] Implement Login
+- [ ] Implement Logout (maybe later)
 - [ ] create make file (not happening)
 - [ ] Figure out most of the user features
 - [x] Setup Health router
+- [x] Logging

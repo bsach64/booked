@@ -1,7 +1,7 @@
 package httpdelivery
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/bsach64/booked/internal/repo"
@@ -28,8 +28,9 @@ func New(config *utils.Config, usecases usecase.Usecase, repositories repo.Repos
 }
 
 func (s *Server) StartServer() {
+	slog.Info("starting http server on", "url", s.config.ServerURL)
 	err := http.ListenAndServe(s.config.ServerURL, s.serverMux)
 	if err != nil {
-		log.Fatalf("got err=%v", err)
+		slog.Error("server stopped", "err", err)
 	}
 }

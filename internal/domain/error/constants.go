@@ -16,6 +16,11 @@ const (
 
 	// User
 	INVALID_USER_ROLE ErrorCategoryCode = "01"
+	EMTPY_PASSWORD    ErrorCategoryCode = "02"
+	USER_NOT_FOUND    ErrorCategoryCode = "03"
+	INVALID_PASSWORD  ErrorCategoryCode = "04"
+	JWT_SIGN_FAILURE  ErrorCategoryCode = "05"
+	INVALID_TOKEN     ErrorCategoryCode = "06"
 
 	// System
 	JSON_DECODE_ERROR ErrorCategoryCode = "01"
@@ -30,6 +35,11 @@ var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]ma
 
 	CATEGORY_USER: {
 		INVALID_USER_ROLE: "invalid user role",
+		EMTPY_PASSWORD:    "empty password",
+		USER_NOT_FOUND:    "user not found",
+		INVALID_PASSWORD:  "invalid password",
+		JWT_SIGN_FAILURE:  "could not sign token",
+		INVALID_TOKEN:     "invalid token",
 	},
 
 	CATEGORY_SYSTEM: {

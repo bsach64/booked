@@ -27,3 +27,32 @@ func (c *CoreHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
+func (c *CoreHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
+	rCtx := r.Context()
+	var loginRequest userdom.LoginRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
+		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
+		return
+	}
+
+	token, err := c.usecases.UserUC.LoginUser(rCtx, &loginRequest)
+	if err != nil {
+		ae, ok := err.(*errordom.AppError)
+		if !ok {
+			httputils.SendAppError(w, http.StatusInternalServerError, nil, ae)
+			return
+		}
+
+		if ae.CategoryCode == errordom.USER_NOT_FOUND || ae.CategoryCode == errordom.INVALID_PASSWORD {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		httputils.SendAppError(w, http.StatusInternalServerError, nil, ae)
+		return
+	}
+
+	httputils.SendJson(w, http.StatusOK, nil, token)
+}
