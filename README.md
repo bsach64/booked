@@ -25,10 +25,11 @@ Thursday
 
 Friday
 - [ ] Download postman
-- [ ] http delivery layer
-- [ ] Register User
+- [x] http delivery layer
+- [ ] Figure out middlewares
+- [x] Register User
 - [ ] Implement Login
-- [ ] Auth
+- [ ] Implement Logout
 - [ ] create make file (not happening)
 - [ ] Figure out most of the user features
 - [x] Setup Health router

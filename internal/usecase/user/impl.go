@@ -5,6 +5,7 @@ import (
 
 	userdom "github.com/bsach64/booked/internal/domain/user"
 	"github.com/bsach64/booked/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type impl struct {
@@ -12,7 +13,22 @@ type impl struct {
 	userRepo userdom.Repository
 }
 
-func (i *impl) CreateUser(ctx context.Context, user userdom.User) error {
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	return string(bytes), err
+}
+
+func (i *impl) CreateUser(ctx context.Context, NewUser userdom.NewUser) error {
+	hashedPassword, err := HashPassword(NewUser.UnhashedPassword)
+	if err != nil {
+		return err
+	}
+	user := userdom.User{
+		Name:           NewUser.Name,
+		Email:          NewUser.Email,
+		HashedPassword: hashedPassword,
+		Role:           userdom.USER,
+	}
 	return i.userRepo.CreateUser(ctx, user)
 }
 

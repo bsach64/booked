@@ -5,5 +5,10 @@ import (
 )
 
 func (s *Server) addRoutes() {
-	s.serverMux.HandleFunc("/health", httphandler.HealthHandler)
+	coreHandler := httphandler.New(s.usecases, s.repositiories)
+
+	s.serverMux.HandleFunc("/health/", coreHandler.HealthHandler)
+
+	// user
+	s.serverMux.HandleFunc("POST /user/register/", coreHandler.RegisterUser)
 }

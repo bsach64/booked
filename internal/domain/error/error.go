@@ -33,3 +33,12 @@ func GetDBError(categoryCode ErrorCategoryCode, msg string, err error) error {
 		ErrorToWrap:  err,
 	}
 }
+
+func GetSystemError(categoryCode ErrorCategoryCode, msg string, err error) error {
+	return &AppError{
+		Category:     CATEGORY_SYSTEM,
+		CategoryCode: categoryCode,
+		Msg:          msg,
+		ErrorToWrap:  err,
+	}
+}

@@ -17,7 +17,11 @@ func SendJson(w http.ResponseWriter, status int, headers map[string]string, data
 }
 
 // Just to make things explicit that we are sending an error
-func SendAppError(w http.ResponseWriter, status int, headers map[string]string, ae *errordom.AppError) {
+func SendAppError(w http.ResponseWriter, status int, headers map[string]string, err error) {
+	ae, ok := err.(*errordom.AppError)
+	if !ok {
+		ae = errordom.GetSystemError(errordom.UNKNOWN_ERROR, "", err).(*errordom.AppError)
+	}
 	for key, value := range headers {
 		w.Header().Set(key, value)
 	}

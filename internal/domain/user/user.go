@@ -9,6 +9,12 @@ type UserRole string
 const USER UserRole = "user"
 const ADMIN UserRole = "admin"
 
+type NewUser struct {
+	Name             string `json:"name"`
+	UnhashedPassword string `json:"password"`
+	Email            string `json:"email"`
+}
+
 type User struct {
 	Name           string
 	HashedPassword string
@@ -17,7 +23,7 @@ type User struct {
 }
 
 type Usecase interface {
-	CreateUser(ctx context.Context, user User) error
+	CreateUser(ctx context.Context, user NewUser) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 }
 

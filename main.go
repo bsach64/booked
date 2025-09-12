@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 
 	httpdelivery "github.com/bsach64/booked/delivery/http"
 	"github.com/bsach64/booked/internal/repo"
@@ -14,16 +14,15 @@ import (
 )
 
 func main() {
-	// minimum to test everything
 	config, err := utils.GetConfig()
 	if err != nil {
-		fmt.Print(err)
+		log.Fatalf("could not get config err=%v\n", err)
 		return
 	}
 
 	dbCon, err := sql.Open("postgres", config.DBUri)
 	if err != nil {
-		fmt.Print(err)
+		log.Fatalf("could not establish connection to db err=%v\n", err)
 		return
 	}
 

@@ -4,8 +4,9 @@ type ErrorCategory string
 type ErrorCategoryCode string
 
 const (
-	CATEGORY_USER ErrorCategory = "USER"
-	CATEGORY_DB   ErrorCategory = "DB"
+	CATEGORY_USER   ErrorCategory = "USER"
+	CATEGORY_DB     ErrorCategory = "DB"
+	CATEGORY_SYSTEM ErrorCategory = "SYS"
 )
 
 const (
@@ -15,6 +16,10 @@ const (
 
 	// User
 	INVALID_USER_ROLE ErrorCategoryCode = "01"
+
+	// System
+	JSON_DECODE_ERROR ErrorCategoryCode = "01"
+	UNKNOWN_ERROR     ErrorCategoryCode = "02"
 )
 
 var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]map[ErrorCategoryCode]string{
@@ -25,5 +30,10 @@ var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]ma
 
 	CATEGORY_USER: {
 		INVALID_USER_ROLE: "invalid user role",
+	},
+
+	CATEGORY_SYSTEM: {
+		JSON_DECODE_ERROR: "could not decode json",
+		UNKNOWN_ERROR:     "unknown error occured",
 	},
 }
