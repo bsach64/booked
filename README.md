@@ -3,7 +3,7 @@ doing things
 Problem Statement
     - Design and build a scalable backend system that supports the following:
     User Features
-        Browse a list of upcoming events with details (name, venue, time, capacity).
+- [x] Browse a list of upcoming events with details (name, venue, time, capacity).
         Book and cancel tickets, ensuring seat availability is updated correctly.
         View booking history.
     Admin Features
@@ -71,4 +71,5 @@ Friday
 - [x] Admin Check
 - [x] Return Event ID as well
 - [ ] Graceful Shutdown of server
-- [ ] Cleanup error handling
+- [ ] Cleanup error handling (do this at the end)
+- [ ] User in context

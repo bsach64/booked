@@ -10,25 +10,14 @@ import (
 func (m *CoreMiddleware) Admin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rCtx := r.Context()
-		email := r.Header.Get("X-EMAIL")
-		if email == "" {
+		user, ok := rCtx.Value("USER").(*userdom.User)
+		if !ok {
 			httputils.SendAppError(w, http.StatusUnauthorized, nil, nil)
 			return
 		}
 
-		user, err := m.usecases.UserUC.GetUserByEmail(rCtx, email)
-		if err != nil {
-			httputils.SendAppError(w, http.StatusUnauthorized, nil, err)
-			return
-		}
-
-		if user == nil {
-			httputils.SendAppError(w, http.StatusUnauthorized, nil, err)
-			return
-		}
-
 		if user.Role != userdom.ADMIN {
-			httputils.SendAppError(w, http.StatusUnauthorized, nil, err)
+			httputils.SendAppError(w, http.StatusUnauthorized, nil, nil)
 			return
 		}
 

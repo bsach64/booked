@@ -22,6 +22,12 @@ type Ticket struct {
 	Event  *eventdom.Event
 }
 
+type ReserveTicketRequest struct {
+	EventID string `json:"event_id"`
+	UserID  string `json:"user_id"`
+	Count   int    `json:"count"`
+}
+
 type Usecase interface {
 	ReserveTicket(ctx context.Context, eventID uuid.UUID, userEmail string) error
 	BookTicket(ctx context.Context, ticketID uuid.UUID) error
