@@ -52,3 +52,27 @@ func (c *CoreHandler) GetPaginatedEvents(w http.ResponseWriter, r *http.Request)
 
 	httputils.SendJson(w, http.StatusOK, nil, eventsResponse)
 }
+
+func (c *CoreHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	rCtx := r.Context()
+	id := r.URL.Query().Get("id")
+
+	statusCode := http.StatusInternalServerError
+	err := c.usecases.EventUC.DeleteEvent(rCtx, id)
+	if err != nil {
+		ae, ok := err.(*errordom.AppError)
+		if !ok {
+			httputils.SendAppError(w, statusCode, nil, err)
+			return
+		}
+
+		if ae.CategoryCode == errordom.NO_EVENT_FOUND {
+			statusCode = http.StatusBadRequest
+		}
+
+		httputils.SendAppError(w, statusCode, nil, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

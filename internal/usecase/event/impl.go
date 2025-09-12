@@ -7,6 +7,7 @@ import (
 	eventdom "github.com/bsach64/booked/internal/domain/event"
 	"github.com/bsach64/booked/internal/repo"
 	"github.com/bsach64/booked/utils"
+	"github.com/google/uuid"
 )
 
 type impl struct {
@@ -82,6 +83,15 @@ func (i *impl) CreateEvent(ctx context.Context, eventRequest *eventdom.CreateEve
 		return err
 	}
 	return nil
+}
+
+func (i *impl) DeleteEvent(ctx context.Context, eventID string) error {
+	eventUUID, err := uuid.Parse(eventID)
+	if err != nil {
+		return errordom.GetEventError(errordom.INVALLID_EVENT_ID, "", nil)
+	}
+
+	return i.repositories.Event.DeleteEvent(ctx, eventUUID)
 }
 
 func New(config *utils.Config, repositories repo.Repositories) eventdom.Usecase {

@@ -46,11 +46,13 @@ type GetEventsResponse struct {
 
 type Usecase interface {
 	CreateEvent(ctx context.Context, eventRequest *CreateEventRequest) error
+	DeleteEvent(ctx context.Context, eventID string) error
 	GetEvents(ctx context.Context, limit int, lastFetchedUnixTime *int64) (*GetEventsResponse, error)
 }
 
 type Repository interface {
 	CreateEvent(ctx context.Context, event *Event) (uuid.UUID, error)
+	DeleteEvent(ctx context.Context, eventID uuid.UUID) error
 	GetEvents(ctx context.Context, limit int) ([]*Event, int64, error)
 	GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]*Event, int64, error)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/bsach64/booked/internal/repo/sql/db"
 	"github.com/bsach64/booked/utils"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -84,6 +85,14 @@ func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUI
 		return [16]byte{}, errordom.GetDBError(errordom.DB_WRITE_ERROR, "", err)
 	}
 	return eventID, nil
+}
+
+func (i *impl) DeleteEvent(ctx context.Context, eventID uuid.UUID) error {
+	_, err := i.dbConn.DeleteEvent(ctx, pgtype.UUID{Bytes: eventID, Valid: true})
+	if err == pgx.ErrNoRows {
+		return errordom.GetEventError(errordom.NO_EVENT_FOUND, "", err)
+	}
+	return err
 }
 
 func New(config *utils.Config, db *db.Queries) eventdom.Repository {

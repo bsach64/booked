@@ -31,6 +31,8 @@ const (
 
 	// Event
 	INVALID_SEAT_COUNT ErrorCategoryCode = "01"
+	INVALLID_EVENT_ID  ErrorCategoryCode = "02"
+	NO_EVENT_FOUND     ErrorCategoryCode = "03"
 )
 
 var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]map[ErrorCategoryCode]string{
@@ -57,5 +59,7 @@ var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]ma
 
 	CATEGORY_EVENT: {
 		INVALID_SEAT_COUNT: "invalid seat count",
+		INVALLID_EVENT_ID:  "invalid event id",
+		NO_EVENT_FOUND:     "no such event found",
 	},
 }

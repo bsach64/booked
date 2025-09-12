@@ -22,8 +22,8 @@ CREATE TABLE tickets (
 	status ticket_status NOT NULL DEFAULT 'availiable',
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-	FOREIGN KEY (user_id) REFERENCES users(id),
-	FOREIGN KEY (event_id) REFERENCES events(id)
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+	FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
 -- +goose StatementEnd

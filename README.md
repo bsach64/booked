@@ -55,7 +55,7 @@ Friday
 - [x] Figure out middlewares
 - [x] Register User
 - [x] Implement Login
-- [ ] Implement Logout (maybe later)
+- [ ] Implement Logout (do later)
 - [ ] create make file (not happening)
 - [x] Setup Health router
 - [x] Logging
@@ -66,8 +66,8 @@ Friday
 - [ ] Redis
 - [ ] Caching?
 - [x] Get Events Paginated
-- [ ] Delete Events
-- [ ] Update Events
+- [x] Delete Events
+- [ ] Update Events (do this later)
 - [ ] Admin Check
 - [x] Return Event ID as well
 - [ ] Graceful Shutdown of server

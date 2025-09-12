@@ -10,3 +10,6 @@ SELECT * FROM events ORDER BY time ASC LIMIT $1;
 
 -- name: GetNextEvents :many
 SELECT * FROM events WHERE time > $1 ORDER BY time ASC LIMIT $2;
+
+-- name: DeleteEvent :one
+DELETE FROM events CASCADE WHERE id = $1 RETURNING id;

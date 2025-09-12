@@ -20,4 +20,5 @@ func (s *Server) addRoutes() {
 	// event
 	s.serverMux.Handle("POST /event/", middlewares.JWTAuth(http.HandlerFunc(coreHandler.CreateEventHandler)))
 	s.serverMux.HandleFunc("GET /event/", coreHandler.GetPaginatedEvents)
+	s.serverMux.Handle("DELETE /event/", middlewares.JWTAuth(http.HandlerFunc(coreHandler.DeleteEvent)))
 }

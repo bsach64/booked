@@ -44,6 +44,16 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 	return err
 }
 
+const deleteEvent = `-- name: DeleteEvent :one
+DELETE FROM events WHERE id = $1 RETURNING id
+`
+
+func (q *Queries) DeleteEvent(ctx context.Context, id pgtype.UUID) (pgtype.UUID, error) {
+	row := q.db.QueryRow(ctx, deleteEvent, id)
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getEvents = `-- name: GetEvents :many
 SELECT id, name, time, address, description, seat_count, latitude, longitude, created_at, updated_at FROM events ORDER BY time ASC LIMIT $1
 `
