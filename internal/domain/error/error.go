@@ -17,6 +17,20 @@ func (ae *AppError) Error() string {
 	)
 }
 
+func GetEventError(categoryCode ErrorCategoryCode, msg string, err error) error {
+	errStr := ""
+	if err != nil {
+		errStr = err.Error()
+	}
+	return &AppError{
+		Category:     CATEGORY_EVENT,
+		CategoryCode: categoryCode,
+		Msg:          msg,
+		ErrorToWrap:  err,
+		ErrorString:  errStr,
+	}
+}
+
 func GetUserError(categoryCode ErrorCategoryCode, msg string, err error) error {
 	errStr := ""
 	if err != nil {

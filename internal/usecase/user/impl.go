@@ -61,6 +61,14 @@ func (i *impl) CreateUser(ctx context.Context, newUser userdom.NewUser) error {
 		return errordom.GetUserError(errordom.EMTPY_PASSWORD, "empty password provided", nil)
 	}
 
+	if newUser.Name == "" {
+		return errordom.GetUserError(errordom.EMPTY_NAME, "empty name provided", nil)
+	}
+
+	if newUser.Email == "" {
+		return errordom.GetUserError(errordom.EMPTY_EMAIL, "empty name provided", nil)
+	}
+
 	hashedPassword, err := HashPassword(newUser.UnhashedPassword)
 	if err != nil {
 		return err

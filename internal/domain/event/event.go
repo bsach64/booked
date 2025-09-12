@@ -12,8 +12,9 @@ type Event struct {
 	Time        time.Time
 	Address     string
 	Description string
-	Latitude    float64
-	Longitude   float64
+	SeatCount   int
+	Latitude    *float64
+	Longitude   *float64
 }
 
 type CreateEventRequest struct {
@@ -26,10 +27,28 @@ type CreateEventRequest struct {
 	SeatCount   int      `json:"seat_count"`
 }
 
+type EventResponse struct {
+	Name        string   `json:"name"`
+	UnixTime    int64    `json:"unix_time"`
+	Address     string   `json:"address"`
+	Description string   `json:"description"`
+	SeatCount   int      `json:"seat_count"`
+	Latitude    *float64 `json:"latitude,omitempty"`
+	Longitude   *float64 `json:"longitude,omitempty"`
+}
+
+type GetEventsResponse struct {
+	NextTimeToFetch int64            `json:"next_time_to_fetch"`
+	Events          []*EventResponse `json:"events"`
+}
+
 type Usecase interface {
 	CreateEvent(ctx context.Context, eventRequest *CreateEventRequest) error
+	GetEvents(ctx context.Context, limit int, lastFetchedUnixTime *int64) (*GetEventsResponse, error)
 }
 
 type Repository interface {
 	CreateEvent(ctx context.Context, event *Event) (uuid.UUID, error)
+	GetEvents(ctx context.Context, limit int) ([]*Event, int64, error)
+	GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]*Event, int64, error)
 }

@@ -13,9 +13,9 @@ import (
 
 const createEvent = `-- name: CreateEvent :exec
 INSERT INTO events (
-	id, name, time, address, description, latitude, longitude
+	id, name, time, address, description, latitude, longitude, seat_count
 ) VALUES (
-	$1, $2, $3, $4, $5, $6, $7
+	$1, $2, $3, $4, $5, $6, $7, $8
 )
 `
 
@@ -27,6 +27,7 @@ type CreateEventParams struct {
 	Description string
 	Latitude    pgtype.Float8
 	Longitude   pgtype.Float8
+	SeatCount   int64
 }
 
 func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error {
@@ -38,12 +39,13 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 		arg.Description,
 		arg.Latitude,
 		arg.Longitude,
+		arg.SeatCount,
 	)
 	return err
 }
 
 const getEvents = `-- name: GetEvents :many
-SELECT id, name, time, address, description, latitude, longitude, created_at, updated_at FROM events ORDER BY time ASC LIMIT $1
+SELECT id, name, time, address, description, seat_count, latitude, longitude, created_at, updated_at FROM events ORDER BY time ASC LIMIT $1
 `
 
 func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
@@ -61,6 +63,7 @@ func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
 			&i.Time,
 			&i.Address,
 			&i.Description,
+			&i.SeatCount,
 			&i.Latitude,
 			&i.Longitude,
 			&i.CreatedAt,
@@ -77,7 +80,7 @@ func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
 }
 
 const getNextEvents = `-- name: GetNextEvents :many
-SELECT id, name, time, address, description, latitude, longitude, created_at, updated_at FROM events WHERE time > $1 ORDER BY time ASC LIMIT $2
+SELECT id, name, time, address, description, seat_count, latitude, longitude, created_at, updated_at FROM events WHERE time > $1 ORDER BY time ASC LIMIT $2
 `
 
 type GetNextEventsParams struct {
@@ -100,6 +103,7 @@ func (q *Queries) GetNextEvents(ctx context.Context, arg GetNextEventsParams) ([
 			&i.Time,
 			&i.Address,
 			&i.Description,
+			&i.SeatCount,
 			&i.Latitude,
 			&i.Longitude,
 			&i.CreatedAt,

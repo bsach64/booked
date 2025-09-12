@@ -16,6 +16,48 @@ type impl struct {
 	dbConn *db.Queries
 }
 
+func (i *impl) GetEvents(ctx context.Context, limit int) ([]*eventdom.Event, int64, error) {
+	var events []*eventdom.Event
+	dbEvents, err := i.dbConn.GetEvents(ctx, int32(limit))
+	if err != nil {
+		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)
+	}
+
+	if len(dbEvents) == 0 {
+		return nil, 0, nil
+	}
+
+	lastUnixTime := utils.GetUTCUnixTime(dbEvents[len(dbEvents)-1].Time.Time)
+	for _, dbEvent := range dbEvents {
+		events = append(events, ToEventDomain(dbEvent))
+	}
+
+	return events, lastUnixTime, nil
+}
+
+func (i *impl) GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]*eventdom.Event, int64, error) {
+	var events []*eventdom.Event
+	getNextEventsParams := db.GetNextEventsParams{
+		Time:  pgtype.Timestamp{Time: utils.GetUTCTimeFromUnix(unixTime), Valid: true},
+		Limit: int32(limit),
+	}
+	dbEvents, err := i.dbConn.GetNextEvents(ctx, getNextEventsParams)
+	if err != nil {
+		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)
+	}
+
+	if len(dbEvents) == 0 {
+		return nil, 0, nil
+	}
+
+	lastUnixTime := utils.GetUTCUnixTime(dbEvents[len(dbEvents)-1].Time.Time)
+	for _, dbEvent := range dbEvents {
+		events = append(events, ToEventDomain(dbEvent))
+	}
+
+	return events, lastUnixTime, nil
+}
+
 func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUID, error) {
 	eventID := uuid.New()
 	createEventParams := &db.CreateEventParams{
@@ -23,15 +65,16 @@ func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUI
 		Name:        event.Name,
 		Address:     event.Address,
 		Description: event.Description,
-		Time:        pgtype.Timestamp{Time: event.Time, Valid: true},
+		Time:        pgtype.Timestamp{Time: utils.GetUTCTime(event.Time), Valid: true},
+		SeatCount:   int64(event.SeatCount),
 	}
 
-	if event.Latitude == 0 || event.Longitude == 0 {
+	if event.Latitude == nil || event.Longitude == nil {
 		createEventParams.Latitude.Valid = false
 		createEventParams.Longitude.Valid = false
 	} else {
-		createEventParams.Latitude.Float64 = event.Latitude
-		createEventParams.Longitude.Float64 = event.Longitude
+		createEventParams.Latitude.Float64 = *event.Latitude
+		createEventParams.Longitude.Float64 = *event.Longitude
 		createEventParams.Latitude.Valid = true
 		createEventParams.Longitude.Valid = true
 	}

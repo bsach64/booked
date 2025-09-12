@@ -69,3 +69,4 @@ Friday
 - [ ] Delete Events
 - [ ] Update Events
 - [ ] Admin Check
+- [ ] Return Event ID as well
