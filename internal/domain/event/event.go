@@ -8,6 +8,7 @@ import (
 )
 
 type Event struct {
+	ID          uuid.UUID
 	Name        string
 	Time        time.Time
 	Address     string
@@ -28,6 +29,7 @@ type CreateEventRequest struct {
 }
 
 type EventResponse struct {
+	ID          string   `json:"id"`
 	Name        string   `json:"name"`
 	UnixTime    int64    `json:"unix_time"`
 	Address     string   `json:"address"`

@@ -40,6 +40,7 @@ func (i *impl) GetEvents(ctx context.Context, limit int, lastFetchedUnixTime *in
 			Address:     event.Address,
 			UnixTime:    utils.GetUTCUnixTime(event.Time),
 			SeatCount:   event.SeatCount,
+			ID:          event.ID.String(),
 		}
 
 		if event.Latitude != nil && event.Longitude != nil {

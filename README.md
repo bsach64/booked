@@ -65,8 +65,9 @@ Friday
 - [ ] Book Tickets
 - [ ] Redis
 - [ ] Caching?
-- [ ] Get Events Paginated
+- [x] Get Events Paginated
 - [ ] Delete Events
 - [ ] Update Events
 - [ ] Admin Check
-- [ ] Return Event ID as well
+- [x] Return Event ID as well
+- [ ] Graceful Shutdown of server

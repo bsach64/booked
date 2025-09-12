@@ -13,6 +13,7 @@ func ToEventDomain(dbEvent db.Event) *eventdom.Event {
 		Description: dbEvent.Description,
 		SeatCount:   int(dbEvent.SeatCount),
 		Time:        utils.GetUTCTime(dbEvent.Time.Time),
+		ID:          dbEvent.ID.Bytes,
 	}
 
 	if dbEvent.Latitude.Valid && dbEvent.Longitude.Valid {
