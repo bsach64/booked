@@ -20,7 +20,7 @@ type Usecase struct {
 func New(config *utils.Config, repositories repo.Repositories) Usecase {
 	return Usecase{
 		config:  config,
-		UserUC:  useruc.New(config, repositories.User),
+		UserUC:  useruc.New(config, repositories),
 		EventUC: eventuc.New(config, repositories),
 	}
 }

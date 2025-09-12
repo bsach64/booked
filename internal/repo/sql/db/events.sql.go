@@ -41,3 +41,76 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 	)
 	return err
 }
+
+const getEvents = `-- name: GetEvents :many
+SELECT id, name, time, address, description, latitude, longitude, created_at, updated_at FROM events ORDER BY time ASC LIMIT $1
+`
+
+func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
+	rows, err := q.db.Query(ctx, getEvents, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Event
+	for rows.Next() {
+		var i Event
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Time,
+			&i.Address,
+			&i.Description,
+			&i.Latitude,
+			&i.Longitude,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNextEvents = `-- name: GetNextEvents :many
+SELECT id, name, time, address, description, latitude, longitude, created_at, updated_at FROM events WHERE time > $1 ORDER BY time ASC LIMIT $2
+`
+
+type GetNextEventsParams struct {
+	Time  pgtype.Timestamp
+	Limit int32
+}
+
+func (q *Queries) GetNextEvents(ctx context.Context, arg GetNextEventsParams) ([]Event, error) {
+	rows, err := q.db.Query(ctx, getNextEvents, arg.Time, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Event
+	for rows.Next() {
+		var i Event
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Time,
+			&i.Address,
+			&i.Description,
+			&i.Latitude,
+			&i.Longitude,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

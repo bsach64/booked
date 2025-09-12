@@ -6,14 +6,15 @@ import (
 
 	errordom "github.com/bsach64/booked/internal/domain/error"
 	userdom "github.com/bsach64/booked/internal/domain/user"
+	"github.com/bsach64/booked/internal/repo"
 	"github.com/bsach64/booked/utils"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type impl struct {
-	config   *utils.Config
-	userRepo userdom.Repository
+	config       *utils.Config
+	repositories repo.Repositories
 }
 
 func HashPassword(password string) (string, error) {
@@ -25,7 +26,7 @@ func (i *impl) LoginUser(ctx context.Context, loginRequest *userdom.LoginRequest
 	// 1 day for now
 	expirationTime := time.Now().Add(24 * time.Hour)
 
-	user, err := i.userRepo.GetUserByEmail(ctx, loginRequest.Email)
+	user, err := i.repositories.User.GetUserByEmail(ctx, loginRequest.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -71,16 +72,16 @@ func (i *impl) CreateUser(ctx context.Context, newUser userdom.NewUser) error {
 		HashedPassword: hashedPassword,
 		Role:           userdom.USER,
 	}
-	return i.userRepo.CreateUser(ctx, user)
+	return i.repositories.User.CreateUser(ctx, user)
 }
 
 func (i *impl) GetUserByEmail(ctx context.Context, email string) (*userdom.User, error) {
-	return i.userRepo.GetUserByEmail(ctx, email)
+	return i.repositories.User.GetUserByEmail(ctx, email)
 }
 
-func New(config *utils.Config, userRepo userdom.Repository) userdom.Usecase {
+func New(config *utils.Config, repositories repo.Repositories) userdom.Usecase {
 	return &impl{
-		config:   config,
-		userRepo: userRepo,
+		config:       config,
+		repositories: repositories,
 	}
 }

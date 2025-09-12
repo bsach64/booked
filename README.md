@@ -59,6 +59,13 @@ Friday
 - [ ] create make file (not happening)
 - [x] Setup Health router
 - [x] Logging
-- [ ] Events Table
-- [ ] Bookings Table
+- [x] Events Table
+- [x] Bookings Table
+- [ ] Reserve Tickets
+- [ ] Book Tickets
+- [ ] Redis
 - [ ] Caching?
+- [ ] Get Events Paginated
+- [ ] Delete Events
+- [ ] Update Events
+- [ ] Admin Check
