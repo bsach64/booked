@@ -29,6 +29,17 @@ type CreateEventRequest struct {
 	SeatCount   int      `json:"seat_count"`
 }
 
+type UpdateEventRequest struct {
+	ID          string   `json:"id"`
+	Name        *string  `json:"name"`
+	UnixTime    *int64   `json:"unix_time"`
+	Address     *string  `json:"address"`
+	Description *string  `json:"description"`
+	Latitude    *float64 `json:"latitude"`
+	Longitude   *float64 `json:"longitude"`
+	SeatCount   *int     `json:"seat_count"`
+}
+
 type EventResponse struct {
 	ID                  string   `json:"id"`
 	Name                string   `json:"name"`
@@ -50,6 +61,7 @@ type Usecase interface {
 	CreateEvent(ctx context.Context, eventRequest *CreateEventRequest) error
 	DeleteEvent(ctx context.Context, eventID string) error
 	GetEvents(ctx context.Context, limit int, lastFetchedUnixTime *int64) (*GetEventsResponse, error)
+	UpdateEvent(ctx context.Context, updateEventRequest *UpdateEventRequest) error
 }
 
 type Repository interface {
@@ -57,4 +69,5 @@ type Repository interface {
 	DeleteEvent(ctx context.Context, eventID uuid.UUID) error
 	GetEvents(ctx context.Context, limit int) ([]*Event, int64, error)
 	GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]*Event, int64, error)
+	UpdateEvent(ctx context.Context, updateEventRequest *UpdateEventRequest) error
 }

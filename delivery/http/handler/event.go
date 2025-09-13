@@ -76,3 +76,22 @@ func (c *CoreHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func (c *CoreHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+	rCtx := r.Context()
+	var updateEventRequest eventdom.UpdateEventRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&updateEventRequest); err != nil {
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "could not decode request", err)
+		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
+		return
+	}
+
+	err := c.usecases.EventUC.UpdateEvent(rCtx, &updateEventRequest)
+	if err != nil {
+		httputils.SendAppError(w, http.StatusInternalServerError, nil, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}

@@ -101,6 +101,10 @@ func (i *impl) DeleteEvent(ctx context.Context, eventID string) error {
 	return i.repositories.Event.DeleteEvent(ctx, eventUUID)
 }
 
+func (i *impl) UpdateEvent(ctx context.Context, updateEventRequest *eventdom.UpdateEventRequest) error {
+	return i.repositories.Event.UpdateEvent(ctx, updateEventRequest)
+}
+
 func New(config *utils.Config, repositories repo.Repositories) eventdom.Usecase {
 	return &impl{
 		config:       config,

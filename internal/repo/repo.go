@@ -28,7 +28,7 @@ func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkey
 		queries:      queries,
 		valkeyClient: valkeyClient,
 		User:         userrepo.New(config, queries),
-		Event:        eventrepo.New(config, queries),
+		Event:        eventrepo.New(config, queries, dbConn),
 		Ticket:       ticketrepo.New(config, queries, dbConn, valkeyClient),
 	}
 }

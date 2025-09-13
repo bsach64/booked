@@ -7,8 +7,7 @@ doing things
 
 **Booking Tickets**
 - [x] Do everything as a single tx
-- [ ] check all edge cases
-- [ ] update update_at while booking ticket
+- [x] update update_at while booking ticket
 
 **Booking History**
 - [x] Should be as simple as doing a db call
@@ -37,6 +36,9 @@ doing things
 **Capacity Utilisation**
 - [ ] Capacity Utilisation
 
+**Code Quality**
+- [ ] Graceful Shutdown of server
+- [ ] Check all edge cases
 
 Problem Statement
     - Design and build a scalable backend system that supports the following:
@@ -108,7 +110,6 @@ Friday
 - [ ] Update Events (do this later)
 - [x] Admin Check
 - [x] Return Event ID as well
-- [ ] Graceful Shutdown of server
-- [ ] Cleanup error handling (doing this now)
+- [x] Cleanup error handling (doing this now)
 - [x] User in context
-- [ ] Add availiable tickets to GET /events/
+- [x] Add availiable tickets to GET /events/

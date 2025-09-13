@@ -22,6 +22,7 @@ func (s *Server) addRoutes() {
 	s.serverMux.Handle("POST /event/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.CreateEventHandler)))))
 	s.serverMux.HandleFunc("GET /event/", coreHandler.GetPaginatedEvents)
 	s.serverMux.Handle("DELETE /event/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.DeleteEvent)))))
+	s.serverMux.Handle("POST /event/update/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.UpdateEvent)))))
 
 	// tickets
 	s.serverMux.Handle("POST /ticket/reserve/", middlewares.JWTAuth(middlewares.SetUserInCtx(http.HandlerFunc(coreHandler.ReserveTickets))))

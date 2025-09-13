@@ -52,6 +52,53 @@ func (q *Queries) DeleteEvent(ctx context.Context, id pgtype.UUID) (pgtype.UUID,
 	return id, err
 }
 
+const getEventByID = `-- name: GetEventByID :one
+SELECT
+	e.id, e.name, e.time, e.address, e.description, e.latitude, e.longitude, e.created_at, e.updated_at,
+	COUNT(t.id) AS total_tickets
+FROM
+	events e
+JOIN
+	tickets t
+ON
+	e.id = t.event_id
+WHERE
+	e.id = $1
+GROUP BY
+	e.id
+`
+
+type GetEventByIDRow struct {
+	ID           pgtype.UUID
+	Name         string
+	Time         pgtype.Timestamp
+	Address      string
+	Description  string
+	Latitude     pgtype.Float8
+	Longitude    pgtype.Float8
+	CreatedAt    pgtype.Timestamp
+	UpdatedAt    pgtype.Timestamp
+	TotalTickets int64
+}
+
+func (q *Queries) GetEventByID(ctx context.Context, id pgtype.UUID) (GetEventByIDRow, error) {
+	row := q.db.QueryRow(ctx, getEventByID, id)
+	var i GetEventByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Time,
+		&i.Address,
+		&i.Description,
+		&i.Latitude,
+		&i.Longitude,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.TotalTickets,
+	)
+	return i, err
+}
+
 const getEvents = `-- name: GetEvents :many
 SELECT
 	e.id, e.name, e.time, e.address, e.description, e.latitude, e.longitude, e.created_at, e.updated_at,
@@ -185,4 +232,36 @@ func (q *Queries) GetNextEvents(ctx context.Context, arg GetNextEventsParams) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateEvent = `-- name: UpdateEvent :exec
+UPDATE 
+	events
+SET
+	name = $2, time = $3, address = $4, description = $5, latitude = $6, longitude = $7, updated_at = NOW()
+WHERE
+	id = $1
+`
+
+type UpdateEventParams struct {
+	ID          pgtype.UUID
+	Name        string
+	Time        pgtype.Timestamp
+	Address     string
+	Description string
+	Latitude    pgtype.Float8
+	Longitude   pgtype.Float8
+}
+
+func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) error {
+	_, err := q.db.Exec(ctx, updateEvent,
+		arg.ID,
+		arg.Name,
+		arg.Time,
+		arg.Address,
+		arg.Description,
+		arg.Latitude,
+		arg.Longitude,
+	)
+	return err
 }
