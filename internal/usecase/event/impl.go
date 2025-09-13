@@ -36,18 +36,25 @@ func (i *impl) GetEvents(ctx context.Context, limit int, lastFetchedUnixTime *in
 
 	for _, event := range events {
 		requestEvent := &eventdom.EventResponse{
-			Name:        event.Name,
-			Description: event.Description,
-			Address:     event.Address,
-			UnixTime:    utils.GetUTCUnixTime(event.Time),
-			SeatCount:   event.SeatCount,
-			ID:          event.ID.String(),
+			Name:                event.Name,
+			Description:         event.Description,
+			Address:             event.Address,
+			UnixTime:            utils.GetUTCUnixTime(event.Time),
+			SeatCount:           event.SeatCount,
+			ID:                  event.ID.String(),
+			AvailableSeatsCount: event.AvailableTickets,
 		}
 
 		if event.Latitude != nil && event.Longitude != nil {
 			requestEvent.Latitude = event.Latitude
 			requestEvent.Longitude = event.Longitude
 		}
+
+		reservedTickets, err := i.repositories.Ticket.GetReservedTickets(ctx, event.ID)
+		if err != nil {
+			return nil, err
+		}
+		requestEvent.AvailableSeatsCount -= reservedTickets
 
 		response.Events = append(response.Events, requestEvent)
 	}

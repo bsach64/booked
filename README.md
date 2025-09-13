@@ -14,9 +14,10 @@ doing things
 - [x] Should be as simple as doing a db call
 
 **Cancelling Tickets**
-- [ ] Do everything in a tx
+- [x] Do everything in a tx
 
 **Create Events**
+- [ ] Change to be a tx
 - [x] This is done
 
 **Update Events**

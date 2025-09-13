@@ -4,22 +4,40 @@ import (
 	eventdom "github.com/bsach64/booked/internal/domain/event"
 	"github.com/bsach64/booked/internal/repo/sql/db"
 	"github.com/bsach64/booked/utils"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func ToEventDomain(dbEvent db.Event) *eventdom.Event {
-	event := eventdom.Event{
-		Name:        dbEvent.Name,
-		Address:     dbEvent.Address,
-		Description: dbEvent.Description,
-		SeatCount:   int(dbEvent.SeatCount),
-		Time:        utils.GetUTCTime(dbEvent.Time.Time),
-		ID:          dbEvent.ID.Bytes,
+func ToEventDomainFromEventsRow(row db.GetEventsRow) *eventdom.Event {
+	return &eventdom.Event{
+		Name:             row.Name,
+		Address:          row.Address,
+		Description:      row.Description,
+		Time:             utils.GetUTCTime(row.Time.Time),
+		ID:               row.ID.Bytes,
+		SeatCount:        int(row.TotalTickets),
+		AvailableTickets: int(row.AvailableTickets),
+		Latitude:         getPtrIfValid(row.Latitude),
+		Longitude:        getPtrIfValid(row.Longitude),
 	}
+}
 
-	if dbEvent.Latitude.Valid && dbEvent.Longitude.Valid {
-		event.Latitude = &dbEvent.Latitude.Float64
-		event.Longitude = &dbEvent.Latitude.Float64
+func ToEventDomainFromNextEventsRow(row db.GetNextEventsRow) *eventdom.Event {
+	return &eventdom.Event{
+		Name:             row.Name,
+		Address:          row.Address,
+		Description:      row.Description,
+		Time:             utils.GetUTCTime(row.Time.Time),
+		ID:               row.ID.Bytes,
+		SeatCount:        int(row.TotalTickets),
+		AvailableTickets: int(row.AvailableTickets),
+		Latitude:         getPtrIfValid(row.Latitude),
+		Longitude:        getPtrIfValid(row.Longitude),
 	}
+}
 
-	return &event
+func getPtrIfValid(f pgtype.Float8) *float64 {
+	if f.Valid {
+		return &f.Float64
+	}
+	return nil
 }

@@ -62,4 +62,5 @@ type Repository interface {
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
 	GetPastBookings(ctx context.Context, userID uuid.UUID) ([]*PastBookingsResponse, error)
 	CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) error
+	GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error)
 }

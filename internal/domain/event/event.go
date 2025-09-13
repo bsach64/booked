@@ -8,14 +8,15 @@ import (
 )
 
 type Event struct {
-	ID          uuid.UUID
-	Name        string
-	Time        time.Time
-	Address     string
-	Description string
-	SeatCount   int
-	Latitude    *float64
-	Longitude   *float64
+	ID               uuid.UUID
+	Name             string
+	Time             time.Time
+	Address          string
+	Description      string
+	SeatCount        int
+	AvailableTickets int
+	Latitude         *float64
+	Longitude        *float64
 }
 
 type CreateEventRequest struct {
@@ -29,14 +30,15 @@ type CreateEventRequest struct {
 }
 
 type EventResponse struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	UnixTime    int64    `json:"unix_time"`
-	Address     string   `json:"address"`
-	Description string   `json:"description"`
-	SeatCount   int      `json:"seat_count"`
-	Latitude    *float64 `json:"latitude,omitempty"`
-	Longitude   *float64 `json:"longitude,omitempty"`
+	ID                  string   `json:"id"`
+	Name                string   `json:"name"`
+	UnixTime            int64    `json:"unix_time"`
+	Address             string   `json:"address"`
+	Description         string   `json:"description"`
+	SeatCount           int      `json:"seat_count"`
+	AvailableSeatsCount int      `json:"available_seats_count"`
+	Latitude            *float64 `json:"latitude,omitempty"`
+	Longitude           *float64 `json:"longitude,omitempty"`
 }
 
 type GetEventsResponse struct {

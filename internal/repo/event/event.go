@@ -30,7 +30,7 @@ func (i *impl) GetEvents(ctx context.Context, limit int) ([]*eventdom.Event, int
 
 	lastUnixTime := utils.GetUTCUnixTime(dbEvents[len(dbEvents)-1].Time.Time)
 	for _, dbEvent := range dbEvents {
-		events = append(events, ToEventDomain(dbEvent))
+		events = append(events, ToEventDomainFromEventsRow(dbEvent))
 	}
 
 	return events, lastUnixTime, nil
@@ -53,7 +53,7 @@ func (i *impl) GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]
 
 	lastUnixTime := utils.GetUTCUnixTime(dbEvents[len(dbEvents)-1].Time.Time)
 	for _, dbEvent := range dbEvents {
-		events = append(events, ToEventDomain(dbEvent))
+		events = append(events, ToEventDomainFromNextEventsRow(dbEvent))
 	}
 
 	return events, lastUnixTime, nil
@@ -67,7 +67,6 @@ func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUI
 		Address:     event.Address,
 		Description: event.Description,
 		Time:        pgtype.Timestamp{Time: utils.GetUTCTime(event.Time), Valid: true},
-		SeatCount:   int64(event.SeatCount),
 	}
 
 	if event.Latitude == nil || event.Longitude == nil {

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	// "log/slog"
 	"strconv"
 
 	errordom "github.com/bsach64/booked/internal/domain/error"
@@ -221,6 +220,24 @@ func (i *impl) CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid
 		return errordom.GetDBError(errordom.DB_TX_ERROR, "failed to commit tx", err)
 	}
 	return nil
+}
+
+func (i *impl) GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error) {
+	dbTicketIDs, err := i.queries.GetAvailableTickets(ctx, pgtype.UUID{Bytes: eventID, Valid: true})
+	if err != nil {
+		return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get available tickets", err)
+	}
+
+	idStrs := []string{}
+	for _, id := range dbTicketIDs {
+		idStrs = append(idStrs, id.String())
+	}
+
+	count, err := i.valkeyClient.Do(ctx, i.valkeyClient.B().Exists().Key(idStrs...).Build()).AsInt64()
+	if err != nil {
+		return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get reserved ticket count", err)
+	}
+	return int(count), nil
 }
 
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {

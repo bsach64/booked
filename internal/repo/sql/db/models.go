@@ -101,7 +101,6 @@ type Event struct {
 	Time        pgtype.Timestamp
 	Address     string
 	Description string
-	SeatCount   int64
 	Latitude    pgtype.Float8
 	Longitude   pgtype.Float8
 	CreatedAt   pgtype.Timestamp

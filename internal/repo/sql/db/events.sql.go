@@ -13,9 +13,9 @@ import (
 
 const createEvent = `-- name: CreateEvent :exec
 INSERT INTO events (
-	id, name, time, address, description, latitude, longitude, seat_count
+	id, name, time, address, description, latitude, longitude
 ) VALUES (
-	$1, $2, $3, $4, $5, $6, $7, $8
+	$1, $2, $3, $4, $5, $6, $7
 )
 `
 
@@ -27,7 +27,6 @@ type CreateEventParams struct {
 	Description string
 	Latitude    pgtype.Float8
 	Longitude   pgtype.Float8
-	SeatCount   int64
 }
 
 func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error {
@@ -39,7 +38,6 @@ func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) error 
 		arg.Description,
 		arg.Latitude,
 		arg.Longitude,
-		arg.SeatCount,
 	)
 	return err
 }
@@ -55,29 +53,58 @@ func (q *Queries) DeleteEvent(ctx context.Context, id pgtype.UUID) (pgtype.UUID,
 }
 
 const getEvents = `-- name: GetEvents :many
-SELECT id, name, time, address, description, seat_count, latitude, longitude, created_at, updated_at FROM events ORDER BY time ASC LIMIT $1
+SELECT
+	e.id, e.name, e.time, e.address, e.description, e.latitude, e.longitude, e.created_at, e.updated_at,
+	COUNT(t.id) AS total_tickets,
+	COUNT(t.id) FILTER (WHERE t.status = 'available') AS available_tickets
+FROM
+	events e
+JOIN
+	tickets t
+ON
+	e.id = t.event_id
+GROUP BY
+	e.id
+ORDER BY
+	e.time ASC
+LIMIT $1
 `
 
-func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
+type GetEventsRow struct {
+	ID               pgtype.UUID
+	Name             string
+	Time             pgtype.Timestamp
+	Address          string
+	Description      string
+	Latitude         pgtype.Float8
+	Longitude        pgtype.Float8
+	CreatedAt        pgtype.Timestamp
+	UpdatedAt        pgtype.Timestamp
+	TotalTickets     int64
+	AvailableTickets int64
+}
+
+func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]GetEventsRow, error) {
 	rows, err := q.db.Query(ctx, getEvents, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Event
+	var items []GetEventsRow
 	for rows.Next() {
-		var i Event
+		var i GetEventsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Time,
 			&i.Address,
 			&i.Description,
-			&i.SeatCount,
 			&i.Latitude,
 			&i.Longitude,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TotalTickets,
+			&i.AvailableTickets,
 		); err != nil {
 			return nil, err
 		}
@@ -90,7 +117,23 @@ func (q *Queries) GetEvents(ctx context.Context, limit int32) ([]Event, error) {
 }
 
 const getNextEvents = `-- name: GetNextEvents :many
-SELECT id, name, time, address, description, seat_count, latitude, longitude, created_at, updated_at FROM events WHERE time > $1 ORDER BY time ASC LIMIT $2
+SELECT 
+	e.id, e.name, e.time, e.address, e.description, e.latitude, e.longitude, e.created_at, e.updated_at,
+	COUNT(t.id) AS total_tickets,
+	COUNT(t.id) FILTER (WHERE t.status = 'available') AS available_tickets
+FROM
+	events e
+JOIN
+	tickets t
+ON
+	e.id = t.event_id
+WHERE
+	time > $1
+GROUP BY
+	e.id
+ORDER BY
+	e.time ASC
+LIMIT $2
 `
 
 type GetNextEventsParams struct {
@@ -98,26 +141,41 @@ type GetNextEventsParams struct {
 	Limit int32
 }
 
-func (q *Queries) GetNextEvents(ctx context.Context, arg GetNextEventsParams) ([]Event, error) {
+type GetNextEventsRow struct {
+	ID               pgtype.UUID
+	Name             string
+	Time             pgtype.Timestamp
+	Address          string
+	Description      string
+	Latitude         pgtype.Float8
+	Longitude        pgtype.Float8
+	CreatedAt        pgtype.Timestamp
+	UpdatedAt        pgtype.Timestamp
+	TotalTickets     int64
+	AvailableTickets int64
+}
+
+func (q *Queries) GetNextEvents(ctx context.Context, arg GetNextEventsParams) ([]GetNextEventsRow, error) {
 	rows, err := q.db.Query(ctx, getNextEvents, arg.Time, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Event
+	var items []GetNextEventsRow
 	for rows.Next() {
-		var i Event
+		var i GetNextEventsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Time,
 			&i.Address,
 			&i.Description,
-			&i.SeatCount,
 			&i.Latitude,
 			&i.Longitude,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TotalTickets,
+			&i.AvailableTickets,
 		); err != nil {
 			return nil, err
 		}

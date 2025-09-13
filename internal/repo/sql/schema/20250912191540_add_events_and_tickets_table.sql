@@ -6,7 +6,6 @@ CREATE TABLE events (
 	time TIMESTAMP NOT NULL,
 	address TEXT NOT NULL,
 	description TEXT NOT NULL,
-	seat_count BIGINT NOT NULL,
 	latitude DOUBLE PRECISION,
 	longitude DOUBLE PRECISION,
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
