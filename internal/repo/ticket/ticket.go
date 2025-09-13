@@ -163,6 +163,32 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uu
 	return nil
 }
 
+func (i *impl) GetPastBookings(ctx context.Context, userID uuid.UUID) ([]*ticketdom.PastBookingsResponse, error) {
+	pastBookings := []*ticketdom.PastBookingsResponse{}
+	dbResp, err := i.queries.GetBookingHistory(ctx, pgtype.UUID{Bytes: userID, Valid: true})
+	if err != nil {
+		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get past booking", err)
+	}
+
+	for _, row := range dbResp {
+		pastBooking := &ticketdom.PastBookingsResponse{
+			EventName:        row.Name,
+			EventAddress:     row.Address,
+			EventDescription: row.Address,
+			EventUnixTime:    utils.GetUTCUnixTime(row.Time.Time),
+			NumberOfTickets:  int(row.Count),
+			BookingUnixTime:  utils.GetUTCUnixTime(row.Column8.Time),
+		}
+
+		if row.Latitude.Valid && row.Longitude.Valid {
+			pastBooking.EventLatitude = &row.Latitude.Float64
+			pastBooking.EventLongitude = &row.Longitude.Float64
+		}
+		pastBookings = append(pastBookings, pastBooking)
+	}
+	return pastBookings, nil
+}
+
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {
 	return &impl{
 		config:       config,

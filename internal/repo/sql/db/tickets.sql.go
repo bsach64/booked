@@ -53,3 +53,65 @@ func (q *Queries) GetAvailableTickets(ctx context.Context, eventID pgtype.UUID) 
 	}
 	return items, nil
 }
+
+const getBookingHistory = `-- name: GetBookingHistory :many
+SELECT
+	name,
+	time,
+	address,
+	description,
+	latitude,
+	longitude,
+	COUNT(tickets.id),
+	MAX(tickets.updated_at)::TIMESTAMP
+FROM
+	tickets
+JOIN
+	events
+ON
+	tickets.event_id = events.id
+WHERE
+	tickets.user_id = $1 AND
+	tickets.status = 'booked'
+GROUP BY events.id
+`
+
+type GetBookingHistoryRow struct {
+	Name        string
+	Time        pgtype.Timestamp
+	Address     string
+	Description string
+	Latitude    pgtype.Float8
+	Longitude   pgtype.Float8
+	Count       int64
+	Column8     pgtype.Timestamp
+}
+
+func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]GetBookingHistoryRow, error) {
+	rows, err := q.db.Query(ctx, getBookingHistory, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetBookingHistoryRow
+	for rows.Next() {
+		var i GetBookingHistoryRow
+		if err := rows.Scan(
+			&i.Name,
+			&i.Time,
+			&i.Address,
+			&i.Description,
+			&i.Latitude,
+			&i.Longitude,
+			&i.Count,
+			&i.Column8,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

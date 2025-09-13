@@ -56,3 +56,21 @@ func (c *CoreHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	httputils.SendJson(w, http.StatusOK, nil, token)
 }
+
+func (c *CoreHandler) UserBookings(w http.ResponseWriter, r *http.Request) {
+	rCtx := r.Context()
+
+	user, ok := rCtx.Value(httputils.USER_CTX_KEY).(*userdom.User)
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	pastBookings, err := c.usecases.TicketUC.GetPastBookings(rCtx, user)
+	if err != nil {
+		httputils.SendAppError(w, http.StatusInternalServerError, nil, err)
+		return
+	}
+
+	httputils.SendJson(w, http.StatusOK, nil, pastBookings)
+}

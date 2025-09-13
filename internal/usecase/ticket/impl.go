@@ -5,6 +5,7 @@ import (
 
 	errordom "github.com/bsach64/booked/internal/domain/error"
 	ticketdom "github.com/bsach64/booked/internal/domain/ticket"
+	userdom "github.com/bsach64/booked/internal/domain/user"
 	"github.com/bsach64/booked/internal/repo"
 	"github.com/bsach64/booked/utils"
 	"github.com/google/uuid"
@@ -30,20 +31,6 @@ func (i *impl) ReserveTickets(ctx context.Context, reserveTickets *ticketdom.Res
 		return nil, err
 	}
 
-	// ticketIDs, err := i.repositories.Ticket.GetAvailiableTickets(ctx, eventID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// if len(ticketIDs) < reserveTickets.Count {
-	// 	return nil, errordom.GetEventError(errordom.TOO_FEW_TICKETS, "not enough tickets", err)
-	// }
-	//
-	// err = i.repositories.Ticket.ReserveTickets(ctx, reserveTickets.UserID, ticketIDs[:reserveTickets.Count])
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
 	var ticketIDStrs []string
 	for _, id := range ticketIDs[:reserveTickets.Count] {
 		ticketIDStrs = append(ticketIDStrs, id.String())
@@ -52,6 +39,10 @@ func (i *impl) ReserveTickets(ctx context.Context, reserveTickets *ticketdom.Res
 	return &ticketdom.ReserveTicketsResponse{
 		TicketIDs: ticketIDStrs,
 	}, nil
+}
+
+func (i *impl) GetPastBookings(ctx context.Context, user *userdom.User) ([]*ticketdom.PastBookingsResponse, error) {
+	return i.repositories.Ticket.GetPastBookings(ctx, user.ID)
 }
 
 func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []string) error {

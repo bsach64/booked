@@ -6,8 +6,9 @@ doing things
 - [ ] Number of seats available as part of GET /events/
 
 **Booking Tickets**
-- [ ] Do everything as a single tx
+- [x] Do everything as a single tx
 - [ ] check all edge cases
+- [ ] update update_at while booking ticket
 
 **Booking History**
 - [ ] Should be as simple as doing a db call

@@ -16,6 +16,7 @@ func (s *Server) addRoutes() {
 	// user
 	s.serverMux.HandleFunc("POST /user/register/", coreHandler.RegisterUser)
 	s.serverMux.HandleFunc("POST /user/login/", coreHandler.LoginUser)
+	s.serverMux.Handle("GET /user/bookings/", middlewares.JWTAuth(middlewares.SetUserInCtx(http.HandlerFunc(coreHandler.UserBookings))))
 
 	// event
 	s.serverMux.Handle("POST /event/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.CreateEventHandler)))))
