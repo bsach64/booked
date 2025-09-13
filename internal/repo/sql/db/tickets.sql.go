@@ -156,3 +156,40 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 	}
 	return items, nil
 }
+
+const totalBookings = `-- name: TotalBookings :many
+SELECT
+	event_id,
+	COUNT(id) AS total_seats,
+	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets
+FROM
+	tickets
+GROUP BY
+	event_id
+`
+
+type TotalBookingsRow struct {
+	EventID       pgtype.UUID
+	TotalSeats    int64
+	BookedTickets int64
+}
+
+func (q *Queries) TotalBookings(ctx context.Context) ([]TotalBookingsRow, error) {
+	rows, err := q.db.Query(ctx, totalBookings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TotalBookingsRow
+	for rows.Next() {
+		var i TotalBookingsRow
+		if err := rows.Scan(&i.EventID, &i.TotalSeats, &i.BookedTickets); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -20,8 +20,8 @@ doing things
 - [x] This is done
 
 **Update Events**
-- [ ] Update everything else
-- [ ] Updating seat count is going to be tough
+- [x] Update everything else
+- [x] Updating seat count is going to be tough
 
 **Delete Events**
 - [x] This is done

@@ -252,6 +252,24 @@ func (i *impl) GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, 
 	return int(count), nil
 }
 
+func (i *impl) GetTotalBookings(ctx context.Context) ([]*ticketdom.TotalBookingResponse, error) {
+	response := []*ticketdom.TotalBookingResponse{}
+	stats, err := i.queries.TotalBookings(ctx)
+	if err != nil {
+		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
+	}
+
+	for _, stat := range stats {
+		data := &ticketdom.TotalBookingResponse{
+			EventID:     stat.EventID.String(),
+			TotalSeats:  int(stat.TotalSeats),
+			SoldTickets: int(stat.BookedTickets),
+		}
+		response = append(response, data)
+	}
+	return response, nil
+}
+
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {
 	return &impl{
 		config:       config,

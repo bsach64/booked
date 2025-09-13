@@ -29,4 +29,6 @@ func (s *Server) addRoutes() {
 	s.serverMux.Handle("POST /ticket/book/", middlewares.JWTAuth(middlewares.SetUserInCtx(http.HandlerFunc(coreHandler.BookTickets))))
 	s.serverMux.Handle("POST /ticket/cancel/", middlewares.JWTAuth(middlewares.SetUserInCtx(http.HandlerFunc(coreHandler.CancelTickets))))
 
+	// analytics
+	s.serverMux.Handle("GET /analytics/total_bookings/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.TotalBookingsHandler)))))
 }
