@@ -39,6 +39,53 @@ type CreateTicketsParams struct {
 	EventID pgtype.UUID
 }
 
+const getAnalytics = `-- name: GetAnalytics :many
+SELECT
+	event_id,
+	COUNT(id) AS total_seats,
+	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets,
+	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation
+FROM
+	tickets
+GROUP BY
+	event_id
+ORDER BY
+	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION
+DESC
+`
+
+type GetAnalyticsRow struct {
+	EventID             pgtype.UUID
+	TotalSeats          int64
+	BookedTickets       int64
+	CapacityUtilisation float64
+}
+
+func (q *Queries) GetAnalytics(ctx context.Context) ([]GetAnalyticsRow, error) {
+	rows, err := q.db.Query(ctx, getAnalytics)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAnalyticsRow
+	for rows.Next() {
+		var i GetAnalyticsRow
+		if err := rows.Scan(
+			&i.EventID,
+			&i.TotalSeats,
+			&i.BookedTickets,
+			&i.CapacityUtilisation,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAvailableTickets = `-- name: GetAvailableTickets :many
 SELECT id FROM tickets WHERE event_id = $1 AND status = 'available'
 `
@@ -147,43 +194,6 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 			&i.Count,
 			&i.Column9,
 		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const totalBookings = `-- name: TotalBookings :many
-SELECT
-	event_id,
-	COUNT(id) AS total_seats,
-	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets
-FROM
-	tickets
-GROUP BY
-	event_id
-`
-
-type TotalBookingsRow struct {
-	EventID       pgtype.UUID
-	TotalSeats    int64
-	BookedTickets int64
-}
-
-func (q *Queries) TotalBookings(ctx context.Context) ([]TotalBookingsRow, error) {
-	rows, err := q.db.Query(ctx, totalBookings)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []TotalBookingsRow
-	for rows.Next() {
-		var i TotalBookingsRow
-		if err := rows.Scan(&i.EventID, &i.TotalSeats, &i.BookedTickets); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

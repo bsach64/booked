@@ -9,7 +9,7 @@ import (
 func (c *CoreHandler) TotalBookingsHandler(w http.ResponseWriter, r *http.Request) {
 	rCtx := r.Context()
 
-	resp, err := c.repositories.Ticket.GetTotalBookings(rCtx)
+	resp, err := c.repositories.Ticket.GetAnalytics(rCtx)
 	if err != nil {
 		httputils.SendAppError(w, http.StatusInternalServerError, nil, err)
 		return

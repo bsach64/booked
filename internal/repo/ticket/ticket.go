@@ -252,18 +252,19 @@ func (i *impl) GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, 
 	return int(count), nil
 }
 
-func (i *impl) GetTotalBookings(ctx context.Context) ([]*ticketdom.TotalBookingResponse, error) {
-	response := []*ticketdom.TotalBookingResponse{}
-	stats, err := i.queries.TotalBookings(ctx)
+func (i *impl) GetAnalytics(ctx context.Context) ([]*ticketdom.Analytics, error) {
+	response := []*ticketdom.Analytics{}
+	stats, err := i.queries.GetAnalytics(ctx)
 	if err != nil {
 		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
 	}
 
 	for _, stat := range stats {
-		data := &ticketdom.TotalBookingResponse{
-			EventID:     stat.EventID.String(),
-			TotalSeats:  int(stat.TotalSeats),
-			SoldTickets: int(stat.BookedTickets),
+		data := &ticketdom.Analytics{
+			EventID:             stat.EventID.String(),
+			TotalSeats:          int(stat.TotalSeats),
+			SoldTickets:         int(stat.BookedTickets),
+			CapacityUtilisation: float64(stat.BookedTickets) / float64(stat.TotalSeats),
 		}
 		response = append(response, data)
 	}

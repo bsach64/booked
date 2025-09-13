@@ -36,12 +36,16 @@ SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked
 -- name: CancelTickets :exec
 UPDATE tickets SET user_id = NULL, status = 'available', updated_at = NOW() WHERE id = ANY($1::uuid[]);
 
--- name: TotalBookings :many
+-- name: GetAnalytics :many
 SELECT
 	event_id,
 	COUNT(id) AS total_seats,
-	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets
+	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets,
+	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation
 FROM
 	tickets
 GROUP BY
-	event_id;
+	event_id
+ORDER BY
+	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION
+DESC;

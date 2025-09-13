@@ -8,6 +8,7 @@ doing things
 **Booking Tickets**
 - [x] Do everything as a single tx
 - [x] update update_at while booking ticket
+- [ ] delete from valkey after booking
 
 **Booking History**
 - [x] Should be as simple as doing a db call
@@ -27,14 +28,13 @@ doing things
 - [x] This is done
 
 **Total Bookings**
-- [ ] Total Number of Tickets booked.
-- [ ] Total Number of tickets booked by event.
+- [x] Total Number of tickets booked by event.
 
 **Most Popular Events**
 - [ ] Most Popular events
 
 **Capacity Utilisation**
-- [ ] Capacity Utilisation
+- [x] Capacity Utilisation
 
 **Code Quality**
 - [ ] Graceful Shutdown of server
