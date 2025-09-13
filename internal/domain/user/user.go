@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type UserRole string
@@ -32,6 +33,7 @@ type NewUser struct {
 }
 
 type User struct {
+	ID             uuid.UUID
 	Name           string
 	HashedPassword string
 	Email          string

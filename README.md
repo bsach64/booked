@@ -61,15 +61,16 @@ Friday
 - [x] Logging
 - [x] Events Table
 - [x] Bookings Table
-- [ ] Reserve Tickets
-- [ ] Book Tickets
-- [ ] Redis
-- [ ] Caching?
+- [x] Reserve Tickets
+- [x] Book Tickets
+- [x] Redis
+- [ ] Caching? (not doing this)
 - [x] Get Events Paginated
 - [x] Delete Events
 - [ ] Update Events (do this later)
 - [x] Admin Check
 - [x] Return Event ID as well
 - [ ] Graceful Shutdown of server
-- [ ] Cleanup error handling (do this at the end)
+- [ ] Cleanup error handling (doing this now)
 - [x] User in context
+- [ ] Add availiable tickets to GET /events/

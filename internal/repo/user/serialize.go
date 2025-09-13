@@ -7,6 +7,7 @@ import (
 
 func ToUserDomain(user db.User) *userdom.User {
 	return &userdom.User{
+		ID:             user.ID.Bytes,
 		Name:           user.Name,
 		Email:          user.Email,
 		HashedPassword: user.HashedPassword,

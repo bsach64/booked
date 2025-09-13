@@ -11,6 +11,20 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const bookTickets = `-- name: BookTickets :exec
+UPDATE tickets SET user_id = $1, status = 'booked' WHERE id = ANY($2::uuid[])
+`
+
+type BookTicketsParams struct {
+	UserID  pgtype.UUID
+	Column2 []pgtype.UUID
+}
+
+func (q *Queries) BookTickets(ctx context.Context, arg BookTicketsParams) error {
+	_, err := q.db.Exec(ctx, bookTickets, arg.UserID, arg.Column2)
+	return err
+}
+
 type CreateTicketsParams struct {
 	ID      pgtype.UUID
 	EventID pgtype.UUID

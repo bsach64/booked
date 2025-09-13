@@ -23,8 +23,9 @@ type Ticket struct {
 }
 
 type ReserveTicketRequest struct {
-	EventID string `json:"event_id"`
-	Count   int    `json:"count"`
+	UserID  uuid.UUID `json:"-"`
+	EventID string    `json:"event_id"`
+	Count   int       `json:"count"`
 }
 
 type ReserveTicketsResponse struct {
@@ -33,11 +34,12 @@ type ReserveTicketsResponse struct {
 
 type Usecase interface {
 	ReserveTickets(ctx context.Context, reserveTickets *ReserveTicketRequest) (*ReserveTicketsResponse, error)
-	BookTickets(ctx context.Context, ticketIDs []uuid.UUID) error
+	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []string) error
 }
 
 type Repository interface {
+	GetAvailiableTickets(ctx context.Context, eventID uuid.UUID) ([]uuid.UUID, error)
 	CreateTickets(ctx context.Context, eventID uuid.UUID, count int) error
-	ReserveTickets(ctx context.Context, ticketIDs []uuid.UUID) error
-	BookTickets(ctx context.Context, ticketIDs []uuid.UUID) error
+	ReserveTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
+	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
 }

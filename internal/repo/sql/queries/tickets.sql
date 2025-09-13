@@ -4,3 +4,6 @@ VALUES ($1, $2);
 
 -- name: GetAvailableTickets :many
 SELECT id FROM tickets WHERE event_id = $1 AND status = 'available';
+
+-- name: BookTickets :exec
+UPDATE tickets SET user_id = $1, status = 'booked' WHERE id = ANY($2::uuid[]);
