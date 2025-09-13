@@ -12,7 +12,7 @@ import (
 )
 
 const bookTickets = `-- name: BookTickets :exec
-UPDATE tickets SET user_id = $1, status = 'booked' WHERE id = ANY($2::uuid[])
+UPDATE tickets SET user_id = $1, status = 'booked', updated_at = NOW() WHERE id = ANY($2::uuid[])
 `
 
 type BookTicketsParams struct {
@@ -26,7 +26,7 @@ func (q *Queries) BookTickets(ctx context.Context, arg BookTicketsParams) error 
 }
 
 const cancelTickets = `-- name: CancelTickets :exec
-UPDATE tickets SET user_id = NULL, status = 'available' WHERE id = ANY($1::uuid[])
+UPDATE tickets SET user_id = NULL, status = 'available', updated_at = NOW() WHERE id = ANY($1::uuid[])
 `
 
 func (q *Queries) CancelTickets(ctx context.Context, dollar_1 []pgtype.UUID) error {

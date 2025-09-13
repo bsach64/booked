@@ -6,7 +6,7 @@ VALUES ($1, $2);
 SELECT id FROM tickets WHERE event_id = $1 AND status = 'available';
 
 -- name: BookTickets :exec
-UPDATE tickets SET user_id = $1, status = 'booked' WHERE id = ANY($2::uuid[]);
+UPDATE tickets SET user_id = $1, status = 'booked', updated_at = NOW() WHERE id = ANY($2::uuid[]);
 
 -- name: GetBookingHistory :many
 SELECT
@@ -34,4 +34,4 @@ GROUP BY events.id;
 SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked';
 
 -- name: CancelTickets :exec
-UPDATE tickets SET user_id = NULL, status = 'available' WHERE id = ANY($1::uuid[]);
+UPDATE tickets SET user_id = NULL, status = 'available', updated_at = NOW() WHERE id = ANY($1::uuid[]);

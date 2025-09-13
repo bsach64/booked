@@ -17,7 +17,7 @@ doing things
 - [x] Do everything in a tx
 
 **Create Events**
-- [ ] Change to be a tx
+~- [ ] Change to be a tx~
 - [x] This is done
 
 **Update Events**
