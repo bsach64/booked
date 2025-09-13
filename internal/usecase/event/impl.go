@@ -65,7 +65,7 @@ func (i *impl) CreateEvent(ctx context.Context, eventRequest *eventdom.CreateEve
 	}
 
 	if eventRequest.SeatCount <= 0 {
-		return errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "", nil)
+		return errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "seat count less than 0", nil)
 	}
 
 	if eventRequest.Latitude != nil && eventRequest.Longitude != nil {
@@ -88,7 +88,7 @@ func (i *impl) CreateEvent(ctx context.Context, eventRequest *eventdom.CreateEve
 func (i *impl) DeleteEvent(ctx context.Context, eventID string) error {
 	eventUUID, err := uuid.Parse(eventID)
 	if err != nil {
-		return errordom.GetEventError(errordom.INVALLID_EVENT_ID, "", nil)
+		return errordom.GetEventError(errordom.INVALID_EVENT_ID, "invalid uuid provided", err)
 	}
 
 	return i.repositories.Event.DeleteEvent(ctx, eventUUID)

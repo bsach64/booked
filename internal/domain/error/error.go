@@ -3,72 +3,63 @@ package errordom
 import "fmt"
 
 type AppError struct {
-	Category     ErrorCategory     `json:"category"`
-	CategoryCode ErrorCategoryCode `json:"category_code"`
-	ErrorToWrap  error             `json:"-"`
-	ErrorString  string            `json:"error"`
-	Msg          string            `json:"msg"`
+	Category     ErrorCategory
+	CategoryCode ErrorCategoryCode
+	ErrorToWrap  error
+	Msg          string
 }
 
 func (ae *AppError) Error() string {
 	return fmt.Sprintf(
-		"Category=%v, CategoryCode=%v, CodeMsg=%v, msg=%v, err=%v",
-		ae.Category, ae.CategoryCode, Errors[ae.Category][ae.CategoryCode], ae.ErrorToWrap.Error(), ae.Msg,
+		"category=%v category_code=%v err=%v msg=%v",
+		ae.Category,
+		ae.CategoryCode,
+		ae.ErrorToWrap.Error(),
+		ae.Msg,
 	)
 }
 
 func GetEventError(categoryCode ErrorCategoryCode, msg string, err error) error {
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
 	return &AppError{
 		Category:     CATEGORY_EVENT,
 		CategoryCode: categoryCode,
 		Msg:          msg,
 		ErrorToWrap:  err,
-		ErrorString:  errStr,
 	}
 }
 
 func GetUserError(categoryCode ErrorCategoryCode, msg string, err error) error {
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
 	return &AppError{
 		Category:     CATEGORY_USER,
 		CategoryCode: categoryCode,
 		Msg:          msg,
 		ErrorToWrap:  err,
-		ErrorString:  errStr,
 	}
 }
 
 func GetDBError(categoryCode ErrorCategoryCode, msg string, err error) error {
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
 	return &AppError{
 		Category:     CATEGORY_DB,
 		CategoryCode: categoryCode,
 		Msg:          msg,
 		ErrorToWrap:  err,
-		ErrorString:  errStr,
+	}
+}
+
+func GetTicketError(categoryCode ErrorCategoryCode, msg string, err error) error {
+	return &AppError{
+		Category:     CATEGORY_TICKET,
+		CategoryCode: categoryCode,
+		Msg:          msg,
+		ErrorToWrap:  err,
 	}
 }
 
 func GetSystemError(categoryCode ErrorCategoryCode, msg string, err error) error {
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
 	return &AppError{
 		Category:     CATEGORY_SYSTEM,
 		CategoryCode: categoryCode,
 		Msg:          msg,
 		ErrorToWrap:  err,
-		ErrorString:  errStr,
 	}
 }

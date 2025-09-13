@@ -14,7 +14,7 @@ func (m *CoreMiddleware) JWTAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenBearerString := r.Header.Get("Authorization")
 		if tokenBearerString == "" {
-			ae := errordom.GetUserError(errordom.USER_NOT_FOUND, "jwt token not found", nil)
+			ae := errordom.GetUserError(errordom.INVALID_TOKEN, "jwt token not found", nil)
 			httputils.SendAppError(w, http.StatusUnauthorized, nil, ae)
 			return
 		}
@@ -32,12 +32,12 @@ func (m *CoreMiddleware) JWTAuth(next http.Handler) http.Handler {
 		}
 
 		if !token.Valid {
-			ae := errordom.GetUserError(errordom.INVALID_TOKEN, "", nil)
+			ae := errordom.GetUserError(errordom.INVALID_TOKEN, "invalid jwt token", nil)
 			httputils.SendAppError(w, http.StatusUnauthorized, nil, ae)
 			return
 		}
 
-		r.Header.Set("X-EMAIL", claims.Email)
+		r.Header.Set(httputils.EMAIL_HEADER, claims.Email)
 		next.ServeHTTP(w, r)
 	})
 }

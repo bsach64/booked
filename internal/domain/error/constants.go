@@ -8,12 +8,14 @@ const (
 	CATEGORY_DB     ErrorCategory = "DB"
 	CATEGORY_SYSTEM ErrorCategory = "SYS"
 	CATEGORY_EVENT  ErrorCategory = "EVENT"
+	CATEGORY_TICKET ErrorCategory = "TICKET"
 )
 
 const (
 	// DB
 	DB_READ_ERROR  ErrorCategoryCode = "01"
 	DB_WRITE_ERROR ErrorCategoryCode = "02"
+	DB_TX_ERROR    ErrorCategoryCode = "03"
 
 	// User
 	INVALID_USER_ROLE ErrorCategoryCode = "01"
@@ -28,38 +30,15 @@ const (
 	// System
 	JSON_DECODE_ERROR ErrorCategoryCode = "01"
 	UNKNOWN_ERROR     ErrorCategoryCode = "02"
+	INVALID_UUID      ErrorCategoryCode = "03"
 
 	// Event
 	INVALID_SEAT_COUNT ErrorCategoryCode = "01"
-	INVALLID_EVENT_ID  ErrorCategoryCode = "02"
+	INVALID_EVENT_ID   ErrorCategoryCode = "02"
 	NO_EVENT_FOUND     ErrorCategoryCode = "03"
+
+	// Ticket
+	TOO_FEW_TICKETS     ErrorCategoryCode = "01"
+	TICKET_NOT_RESERVED ErrorCategoryCode = "02"
+	NOT_YOUR_TICKET     ErrorCategoryCode = "03"
 )
-
-var Errors map[ErrorCategory]map[ErrorCategoryCode]string = map[ErrorCategory]map[ErrorCategoryCode]string{
-	CATEGORY_DB: {
-		DB_READ_ERROR:  "unable to read from db",
-		DB_WRITE_ERROR: "unable to write to db",
-	},
-
-	CATEGORY_USER: {
-		INVALID_USER_ROLE: "invalid user role",
-		EMTPY_PASSWORD:    "empty password",
-		USER_NOT_FOUND:    "user not found",
-		INVALID_PASSWORD:  "invalid password",
-		JWT_SIGN_FAILURE:  "could not sign token",
-		INVALID_TOKEN:     "invalid token",
-		EMPTY_EMAIL:       "empty email",
-		EMPTY_NAME:        "empty name",
-	},
-
-	CATEGORY_SYSTEM: {
-		JSON_DECODE_ERROR: "could not decode json",
-		UNKNOWN_ERROR:     "unknown error occured",
-	},
-
-	CATEGORY_EVENT: {
-		INVALID_SEAT_COUNT: "invalid seat count",
-		INVALLID_EVENT_ID:  "invalid event id",
-		NO_EVENT_FOUND:     "no such event found",
-	},
-}

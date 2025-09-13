@@ -15,7 +15,7 @@ func (c *CoreHandler) CreateEventHandler(w http.ResponseWriter, r *http.Request)
 	var createEventRequest eventdom.CreateEventRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&createEventRequest); err != nil {
-		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "could not decode request", err)
 		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
 		return
 	}

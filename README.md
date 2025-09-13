@@ -1,5 +1,41 @@
 doing things
 
+## THE FINAL TODO LIST
+
+**Users browse a list of events**
+- [ ] Number of seats available as part of GET /events/
+
+**Booking Tickets**
+- [ ] Do everything as a single tx
+- [ ] check all edge cases
+
+**Booking History**
+- [ ] Should be as simple as doing a db call
+
+**Cancelling Tickets**
+- [ ] Do everything in a tx
+
+**Create Events**
+- [x] This is done
+
+**Update Events**
+- [ ] Update everything else
+- [ ] Updating seat count is going to be tough
+
+**Delete Events**
+- [x] This is done
+
+**Total Bookings**
+- [ ] Total Number of Tickets booked.
+- [ ] Total Number of tickets booked by event.
+
+**Most Popular Events**
+- [ ] Most Popular events
+
+**Capacity Utilisation**
+- [ ] Capacity Utilisation
+
+
 Problem Statement
     - Design and build a scalable backend system that supports the following:
     User Features

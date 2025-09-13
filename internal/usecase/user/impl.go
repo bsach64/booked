@@ -32,12 +32,12 @@ func (i *impl) LoginUser(ctx context.Context, loginRequest *userdom.LoginRequest
 	}
 
 	if user == nil {
-		return nil, errordom.GetUserError(errordom.USER_NOT_FOUND, "", nil)
+		return nil, errordom.GetUserError(errordom.USER_NOT_FOUND, "no user with given email", nil)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(loginRequest.UnhashedPassword))
 	if err != nil {
-		return nil, errordom.GetUserError(errordom.INVALID_PASSWORD, "", nil)
+		return nil, errordom.GetUserError(errordom.INVALID_PASSWORD, "given password is incorrect", nil)
 	}
 
 	claims := &userdom.Claims{
@@ -51,7 +51,7 @@ func (i *impl) LoginUser(ctx context.Context, loginRequest *userdom.LoginRequest
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(i.config.JwtSecret))
 	if err != nil {
-		return nil, errordom.GetUserError(errordom.JWT_SIGN_FAILURE, "", err)
+		return nil, errordom.GetUserError(errordom.JWT_SIGN_FAILURE, "could not sign jwt", err)
 	}
 	return &userdom.LoginResponse{Token: signedToken}, nil
 }
@@ -66,7 +66,7 @@ func (i *impl) CreateUser(ctx context.Context, newUser userdom.NewUser) error {
 	}
 
 	if newUser.Email == "" {
-		return errordom.GetUserError(errordom.EMPTY_EMAIL, "empty name provided", nil)
+		return errordom.GetUserError(errordom.EMPTY_EMAIL, "empty email provided", nil)
 	}
 
 	hashedPassword, err := HashPassword(newUser.UnhashedPassword)
@@ -84,7 +84,15 @@ func (i *impl) CreateUser(ctx context.Context, newUser userdom.NewUser) error {
 }
 
 func (i *impl) GetUserByEmail(ctx context.Context, email string) (*userdom.User, error) {
-	return i.repositories.User.GetUserByEmail(ctx, email)
+	user, err := i.repositories.User.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errordom.GetUserError(errordom.USER_NOT_FOUND, "no user with given email", nil)
+	}
+	return user, nil
 }
 
 func New(config *utils.Config, repositories repo.Repositories) userdom.Usecase {

@@ -2,7 +2,6 @@ package httphandler
 
 import (
 	"encoding/json"
-	"log/slog"
 	"net/http"
 
 	httputils "github.com/bsach64/booked/delivery/http/utils"
@@ -14,9 +13,8 @@ import (
 func (c *CoreHandler) ReserveTickets(w http.ResponseWriter, r *http.Request) {
 	rCtx := r.Context()
 
-	user, ok := rCtx.Value("USER").(*userdom.User)
+	user, ok := rCtx.Value(httputils.USER_CTX_KEY).(*userdom.User)
 	if !ok {
-		slog.Info("did not get user")
 		httputils.SendAppError(w, http.StatusUnauthorized, nil, nil)
 		return
 	}
@@ -24,7 +22,6 @@ func (c *CoreHandler) ReserveTickets(w http.ResponseWriter, r *http.Request) {
 	var reserveTicketRequest ticketdom.ReserveTicketRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&reserveTicketRequest); err != nil {
-		slog.Info("could not get body")
 		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
 		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
 		return
@@ -37,8 +34,6 @@ func (c *CoreHandler) ReserveTickets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("got resp", "resp", resp)
-
 	httputils.SendJson(w, http.StatusOK, nil, resp)
 }
 
@@ -49,7 +44,7 @@ func (c *CoreHandler) BookTickets(w http.ResponseWriter, r *http.Request) {
 		TicketIDs []string `json:"ticket_ids"`
 	}{}
 
-	user, ok := rCtx.Value("USER").(*userdom.User)
+	user, ok := rCtx.Value(httputils.USER_CTX_KEY).(*userdom.User)
 	if !ok {
 		httputils.SendAppError(w, http.StatusUnauthorized, nil, nil)
 		return

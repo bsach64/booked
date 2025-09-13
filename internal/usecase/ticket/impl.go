@@ -2,9 +2,8 @@ package ticketuc
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 
+	errordom "github.com/bsach64/booked/internal/domain/error"
 	ticketdom "github.com/bsach64/booked/internal/domain/ticket"
 	"github.com/bsach64/booked/internal/repo"
 	"github.com/bsach64/booked/utils"
@@ -19,30 +18,32 @@ type impl struct {
 func (i *impl) ReserveTickets(ctx context.Context, reserveTickets *ticketdom.ReserveTicketRequest) (*ticketdom.ReserveTicketsResponse, error) {
 	eventID, err := uuid.Parse(reserveTickets.EventID)
 	if err != nil {
-		// crazy
-		return nil, fmt.Errorf("uuid")
+		return nil, errordom.GetSystemError(errordom.INVALID_UUID, "invalid uuid", err)
 	}
-	slog.Info("got uuid")
 
-	ticketIDs, err := i.repositories.Ticket.GetAvailiableTickets(ctx, eventID)
+	if reserveTickets.Count <= 0 {
+		return nil, errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "seat count is less than 0", err)
+	}
+
+	ticketIDs, err := i.repositories.Ticket.ReserveTickets(ctx, reserveTickets.UserID, eventID, reserveTickets.Count)
 	if err != nil {
 		return nil, err
 	}
-	slog.Info("got availiable tickets", "ticket_ids", ticketIDs)
 
-	if len(ticketIDs) < reserveTickets.Count {
-		// return an error here
-		return nil, fmt.Errorf("to few")
-
-	}
-
-	err = i.repositories.Ticket.ReserveTickets(ctx, reserveTickets.UserID, ticketIDs[:reserveTickets.Count])
-	if err != nil {
-		// do error handling
-		return nil, err
-	}
-	slog.Info("reserved tickets")
-
+	// ticketIDs, err := i.repositories.Ticket.GetAvailiableTickets(ctx, eventID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// if len(ticketIDs) < reserveTickets.Count {
+	// 	return nil, errordom.GetEventError(errordom.TOO_FEW_TICKETS, "not enough tickets", err)
+	// }
+	//
+	// err = i.repositories.Ticket.ReserveTickets(ctx, reserveTickets.UserID, ticketIDs[:reserveTickets.Count])
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
 	var ticketIDStrs []string
 	for _, id := range ticketIDs[:reserveTickets.Count] {
 		ticketIDStrs = append(ticketIDStrs, id.String())
@@ -59,7 +60,7 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []st
 	for _, idStr := range ticketIDs {
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			return err
+			return errordom.GetSystemError(errordom.INVALID_UUID, "invalid uuid", err)
 		}
 		ids = append(ids, id)
 	}

@@ -38,8 +38,7 @@ type Usecase interface {
 }
 
 type Repository interface {
-	GetAvailiableTickets(ctx context.Context, eventID uuid.UUID) ([]uuid.UUID, error)
 	CreateTickets(ctx context.Context, eventID uuid.UUID, count int) error
-	ReserveTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
+	ReserveTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) ([]uuid.UUID, error)
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
 }

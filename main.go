@@ -37,7 +37,7 @@ func main() {
 	}
 
 	dbQueries := db.New(pool)
-	repositories := repo.New(config, dbQueries, valkeyClient)
+	repositories := repo.New(config, dbQueries, pool, valkeyClient)
 	usecases := usecase.New(config, repositories)
 	server := httpdelivery.New(config, usecases, repositories)
 	server.StartServer()

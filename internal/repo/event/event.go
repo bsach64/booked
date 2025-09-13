@@ -21,7 +21,7 @@ func (i *impl) GetEvents(ctx context.Context, limit int) ([]*eventdom.Event, int
 	var events []*eventdom.Event
 	dbEvents, err := i.dbConn.GetEvents(ctx, int32(limit))
 	if err != nil {
-		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)
+		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read events", err)
 	}
 
 	if len(dbEvents) == 0 {
@@ -44,7 +44,7 @@ func (i *impl) GetNextEvents(ctx context.Context, unixTime int64, limit int) ([]
 	}
 	dbEvents, err := i.dbConn.GetNextEvents(ctx, getNextEventsParams)
 	if err != nil {
-		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "", err)
+		return nil, 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read events", err)
 	}
 
 	if len(dbEvents) == 0 {
@@ -82,7 +82,7 @@ func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUI
 
 	err := i.dbConn.CreateEvent(ctx, *createEventParams)
 	if err != nil {
-		return [16]byte{}, errordom.GetDBError(errordom.DB_WRITE_ERROR, "", err)
+		return [16]byte{}, errordom.GetDBError(errordom.DB_WRITE_ERROR, "could not create event", err)
 	}
 	return eventID, nil
 }
@@ -90,9 +90,9 @@ func (i *impl) CreateEvent(ctx context.Context, event *eventdom.Event) (uuid.UUI
 func (i *impl) DeleteEvent(ctx context.Context, eventID uuid.UUID) error {
 	_, err := i.dbConn.DeleteEvent(ctx, pgtype.UUID{Bytes: eventID, Valid: true})
 	if err == pgx.ErrNoRows {
-		return errordom.GetEventError(errordom.NO_EVENT_FOUND, "", err)
+		return errordom.GetEventError(errordom.NO_EVENT_FOUND, "no event with given id", err)
 	}
-	return err
+	return errordom.GetDBError(errordom.DB_WRITE_ERROR, "could not delete event", err)
 }
 
 func New(config *utils.Config, db *db.Queries) eventdom.Repository {

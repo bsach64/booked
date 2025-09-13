@@ -14,7 +14,7 @@ func (c *CoreHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var newUser userdom.NewUser
 
 	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
-		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "could not decode request", err)
 		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
 		return
 	}
@@ -33,7 +33,7 @@ func (c *CoreHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	var loginRequest userdom.LoginRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "could not decode request", err)
 		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
 		return
 	}
@@ -42,7 +42,7 @@ func (c *CoreHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ae, ok := err.(*errordom.AppError)
 		if !ok {
-			httputils.SendAppError(w, http.StatusInternalServerError, nil, ae)
+			httputils.SendAppError(w, http.StatusInternalServerError, nil, err)
 			return
 		}
 
