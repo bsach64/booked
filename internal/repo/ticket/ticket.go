@@ -139,6 +139,13 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uu
 	dbTicketIDs := []pgtype.UUID{}
 	dbUserID := pgtype.UUID{Bytes: userID, Valid: true}
 
+	tx, err := i.dbConn.Begin(ctx)
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_TX_ERROR, "could not start tx", err)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := i.queries.WithTx(tx)
 	for _, ticket := range ticketIDs {
 		// it should have been reserved for this person
 		// we dont really need to worry about concurrency here
@@ -157,9 +164,14 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uu
 		dbTicketIDs = append(dbTicketIDs, pgtype.UUID{Bytes: ticket, Valid: true})
 	}
 
-	err := i.queries.BookTickets(ctx, db.BookTicketsParams{UserID: dbUserID, Column2: dbTicketIDs})
+	err = qtx.BookTickets(ctx, db.BookTicketsParams{UserID: dbUserID, Column2: dbTicketIDs})
 	if err != nil {
 		return err
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_TX_ERROR, "failed to commit tx", err)
 	}
 	return nil
 }

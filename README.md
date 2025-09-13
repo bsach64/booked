@@ -3,7 +3,7 @@ doing things
 ## THE FINAL TODO LIST
 
 **Users browse a list of events**
-- [ ] Number of seats available as part of GET /events/
+- [x] Number of seats available as part of GET /events/
 
 **Booking Tickets**
 - [x] Do everything as a single tx
