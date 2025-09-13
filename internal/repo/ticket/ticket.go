@@ -3,6 +3,8 @@ package ticketrepo
 import (
 	"context"
 	"errors"
+	"fmt"
+
 	// "log/slog"
 	"strconv"
 
@@ -172,12 +174,13 @@ func (i *impl) GetPastBookings(ctx context.Context, userID uuid.UUID) ([]*ticket
 
 	for _, row := range dbResp {
 		pastBooking := &ticketdom.PastBookingsResponse{
+			EventID:          row.ID.String(),
 			EventName:        row.Name,
 			EventAddress:     row.Address,
 			EventDescription: row.Address,
 			EventUnixTime:    utils.GetUTCUnixTime(row.Time.Time),
 			NumberOfTickets:  int(row.Count),
-			BookingUnixTime:  utils.GetUTCUnixTime(row.Column8.Time),
+			BookingUnixTime:  utils.GetUTCUnixTime(row.Column9.Time),
 		}
 
 		if row.Latitude.Valid && row.Longitude.Valid {
@@ -187,6 +190,37 @@ func (i *impl) GetPastBookings(ctx context.Context, userID uuid.UUID) ([]*ticket
 		pastBookings = append(pastBookings, pastBooking)
 	}
 	return pastBookings, nil
+}
+
+func (i *impl) CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) error {
+	tx, err := i.dbConn.Begin(ctx)
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_TX_ERROR, "could not start tx", err)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := i.queries.WithTx(tx)
+	getBookedTickets := db.GetBookedTicketsParams{
+		EventID: pgtype.UUID{Bytes: eventID, Valid: true},
+		UserID:  pgtype.UUID{Bytes: userID, Valid: true},
+	}
+
+	dbTicketIDs, err := qtx.GetBookedTickets(ctx, getBookedTickets)
+	if len(dbTicketIDs) < count {
+		msg := fmt.Sprintf("count=%v is greater than number of tickets booked", count)
+		return errordom.GetTicketError(errordom.TOO_FEW_TICKETS, msg, nil)
+	}
+
+	err = qtx.CancelTickets(ctx, dbTicketIDs[:count])
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_WRITE_ERROR, "could not canncel tickets", nil)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_TX_ERROR, "failed to commit tx", err)
+	}
+	return nil
 }
 
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {

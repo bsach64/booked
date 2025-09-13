@@ -10,6 +10,7 @@ UPDATE tickets SET user_id = $1, status = 'booked' WHERE id = ANY($2::uuid[]);
 
 -- name: GetBookingHistory :many
 SELECT
+	events.id,
 	name,
 	time,
 	address,
@@ -28,3 +29,9 @@ WHERE
 	tickets.user_id = $1 AND
 	tickets.status = 'booked'
 GROUP BY events.id;
+
+-- name: GetBookedTickets :many
+SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked';
+
+-- name: CancelTickets :exec
+UPDATE tickets SET user_id = NULL, status = 'available' WHERE id = ANY($1::uuid[]);

@@ -11,7 +11,7 @@ doing things
 - [ ] update update_at while booking ticket
 
 **Booking History**
-- [ ] Should be as simple as doing a db call
+- [x] Should be as simple as doing a db call
 
 **Cancelling Tickets**
 - [ ] Do everything in a tx

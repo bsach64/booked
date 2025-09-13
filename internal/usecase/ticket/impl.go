@@ -58,6 +58,19 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []st
 	return i.repositories.Ticket.BookTickets(ctx, userID, ids)
 }
 
+func (i *impl) CancelTickets(ctx context.Context, user *userdom.User, cancelTicketRequest *ticketdom.CancelTicketRequest) error {
+	eventID, err := uuid.Parse(cancelTicketRequest.EventID)
+	if err != nil {
+		return errordom.GetSystemError(errordom.INVALID_UUID, "invalid uuid", err)
+	}
+
+	if cancelTicketRequest.Count <= 0 {
+		return errordom.GetTicketError(errordom.TOO_FEW_TICKETS, "can't cancel negative/zero tickets", err)
+	}
+
+	return i.repositories.Ticket.CancelTickets(ctx, user.ID, eventID, cancelTicketRequest.Count)
+}
+
 func New(config *utils.Config, repositories repo.Repositories) ticketdom.Usecase {
 	return &impl{
 		config:       config,

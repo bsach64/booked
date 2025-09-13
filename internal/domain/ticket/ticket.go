@@ -32,7 +32,13 @@ type ReserveTicketsResponse struct {
 	TicketIDs []string `json:"ticket_ids"`
 }
 
+type CancelTicketRequest struct {
+	EventID string `json:"event_id"`
+	Count   int    `json:"count"`
+}
+
 type PastBookingsResponse struct {
+	EventID          string   `json:"event_id"`
 	EventName        string   `json:"event_name"`
 	EventUnixTime    int64    `json:"event_unix_time"`
 	EventAddress     string   `json:"event_address"`
@@ -47,6 +53,7 @@ type Usecase interface {
 	ReserveTickets(ctx context.Context, reserveTickets *ReserveTicketRequest) (*ReserveTicketsResponse, error)
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []string) error
 	GetPastBookings(ctx context.Context, user *userdom.User) ([]*PastBookingsResponse, error)
+	CancelTickets(ctx context.Context, user *userdom.User, cancelTicketRequest *CancelTicketRequest) error
 }
 
 type Repository interface {
@@ -54,4 +61,5 @@ type Repository interface {
 	ReserveTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) ([]uuid.UUID, error)
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uuid.UUID) error
 	GetPastBookings(ctx context.Context, userID uuid.UUID) ([]*PastBookingsResponse, error)
+	CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) error
 }

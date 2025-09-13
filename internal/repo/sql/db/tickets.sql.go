@@ -25,6 +25,15 @@ func (q *Queries) BookTickets(ctx context.Context, arg BookTicketsParams) error 
 	return err
 }
 
+const cancelTickets = `-- name: CancelTickets :exec
+UPDATE tickets SET user_id = NULL, status = 'available' WHERE id = ANY($1::uuid[])
+`
+
+func (q *Queries) CancelTickets(ctx context.Context, dollar_1 []pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, cancelTickets, dollar_1)
+	return err
+}
+
 type CreateTicketsParams struct {
 	ID      pgtype.UUID
 	EventID pgtype.UUID
@@ -54,8 +63,38 @@ func (q *Queries) GetAvailableTickets(ctx context.Context, eventID pgtype.UUID) 
 	return items, nil
 }
 
+const getBookedTickets = `-- name: GetBookedTickets :many
+SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked'
+`
+
+type GetBookedTicketsParams struct {
+	EventID pgtype.UUID
+	UserID  pgtype.UUID
+}
+
+func (q *Queries) GetBookedTickets(ctx context.Context, arg GetBookedTicketsParams) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, getBookedTickets, arg.EventID, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var id pgtype.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBookingHistory = `-- name: GetBookingHistory :many
 SELECT
+	events.id,
 	name,
 	time,
 	address,
@@ -77,6 +116,7 @@ GROUP BY events.id
 `
 
 type GetBookingHistoryRow struct {
+	ID          pgtype.UUID
 	Name        string
 	Time        pgtype.Timestamp
 	Address     string
@@ -84,7 +124,7 @@ type GetBookingHistoryRow struct {
 	Latitude    pgtype.Float8
 	Longitude   pgtype.Float8
 	Count       int64
-	Column8     pgtype.Timestamp
+	Column9     pgtype.Timestamp
 }
 
 func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]GetBookingHistoryRow, error) {
@@ -97,6 +137,7 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 	for rows.Next() {
 		var i GetBookingHistoryRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Name,
 			&i.Time,
 			&i.Address,
@@ -104,7 +145,7 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 			&i.Latitude,
 			&i.Longitude,
 			&i.Count,
-			&i.Column8,
+			&i.Column9,
 		); err != nil {
 			return nil, err
 		}
