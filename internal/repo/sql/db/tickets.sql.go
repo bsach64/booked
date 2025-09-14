@@ -249,7 +249,7 @@ func (q *Queries) GetCancellationRates(ctx context.Context) ([]GetCancellationRa
 const getDailyBookings = `-- name: GetDailyBookings :many
 SELECT
 	event_id,
-	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::data = CURRENT_DATE) AS today_booked_tickets
+	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::date = CURRENT_DATE) AS today_booked_tickets
 FROM
 	tickets
 GROUP BY
