@@ -4,7 +4,7 @@ import "github.com/caarlos0/env/v11"
 
 type Config struct {
 	DBUri     string `env:"DB_URI" envDefault:"postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"`
-	ValkeyURL string `env:"VALKEY_URL" envDefault:"localhost:6379"`
+	ValkeyURL string `env:"VALKEY_URL" envDefault:"redis://localhost:6379"`
 	JwtSecret string `env:"JWT_SECRET" envDefault:"verysecret"`
 	ServerURL string `env:"SERVER_URL" envDefault:"localhost:8080"`
 }

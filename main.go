@@ -35,9 +35,12 @@ func main() {
 		log.Fatalf("could not establish connection to db err=%v\n", err)
 	}
 
-	valkeyClient, err := valkey.NewClient(valkey.ClientOption{
-		InitAddress: []string{config.ValkeyURL},
-	})
+	valkeyURL, err := valkey.ParseURL(config.ValkeyURL)
+	if err != nil {
+		log.Fatalf("incorrect valkey url err=%v", err)
+	}
+
+	valkeyClient, err := valkey.NewClient(valkeyURL)
 	if err != nil {
 		log.Fatalf("could not establish connection to valkey err=%v\n", err)
 	}
