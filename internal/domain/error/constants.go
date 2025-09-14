@@ -4,11 +4,12 @@ type ErrorCategory string
 type ErrorCategoryCode string
 
 const (
-	CATEGORY_USER   ErrorCategory = "USER"
-	CATEGORY_DB     ErrorCategory = "DB"
-	CATEGORY_SYSTEM ErrorCategory = "SYS"
-	CATEGORY_EVENT  ErrorCategory = "EVENT"
-	CATEGORY_TICKET ErrorCategory = "TICKET"
+	CATEGORY_USER     ErrorCategory = "USER"
+	CATEGORY_DB       ErrorCategory = "DB"
+	CATEGORY_SYSTEM   ErrorCategory = "SYS"
+	CATEGORY_EVENT    ErrorCategory = "EVENT"
+	CATEGORY_TICKET   ErrorCategory = "TICKET"
+	CATEGORY_WAITLIST ErrorCategory = "WAITLIST"
 )
 
 const (
@@ -41,4 +42,8 @@ const (
 	TOO_FEW_TICKETS     ErrorCategoryCode = "01"
 	TICKET_NOT_RESERVED ErrorCategoryCode = "02"
 	NOT_YOUR_TICKET     ErrorCategoryCode = "03"
+
+	// waitlist
+	ALREADY_IN_WAILIST     ErrorCategoryCode = "01"
+	INVALID_WAITLIST_COUNT ErrorCategoryCode = "02"
 )

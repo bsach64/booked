@@ -46,6 +46,15 @@ func GetDBError(categoryCode ErrorCategoryCode, msg string, err error) error {
 	}
 }
 
+func GetWaitlistError(categoryCode ErrorCategoryCode, msg string, err error) error {
+	return &AppError{
+		Category:     CATEGORY_WAITLIST,
+		CategoryCode: categoryCode,
+		Msg:          msg,
+		ErrorToWrap:  err,
+	}
+}
+
 func GetTicketError(categoryCode ErrorCategoryCode, msg string, err error) error {
 	return &AppError{
 		Category:     CATEGORY_TICKET,

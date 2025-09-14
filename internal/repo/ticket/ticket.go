@@ -305,6 +305,15 @@ func (i *impl) GetCancellationRates(ctx context.Context) ([]*ticketdom.Cancellat
 	return response, nil
 }
 
+func (i *impl) GetAvailableTickets(ctx context.Context, eventID uuid.UUID) (int, error) {
+	ids, err := i.queries.GetAvailableTickets(ctx, pgtype.UUID{Bytes: eventID, Valid: true})
+	if err != nil {
+		return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
+	}
+
+	return len(ids), nil
+}
+
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {
 	return &impl{
 		config:       config,

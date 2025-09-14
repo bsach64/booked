@@ -39,6 +39,30 @@ type CreateTicketsParams struct {
 	EventID pgtype.UUID
 }
 
+const getAllTickets = `-- name: GetAllTickets :many
+SELECT id FROM tickets WHERE event_id = $1
+`
+
+func (q *Queries) GetAllTickets(ctx context.Context, eventID pgtype.UUID) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, getAllTickets, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var id pgtype.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAnalytics = `-- name: GetAnalytics :many
 SELECT
 	event_id,

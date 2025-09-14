@@ -1,7 +1,6 @@
 package httpdelivery
 
 import (
-	"log/slog"
 	"net/http"
 
 	"github.com/bsach64/booked/internal/repo"
@@ -16,7 +15,7 @@ type Server struct {
 	repositiories repo.Repositories
 }
 
-func New(config *utils.Config, usecases usecase.Usecase, repositories repo.Repositories) *Server {
+func New(config *utils.Config, usecases usecase.Usecase, repositories repo.Repositories) *http.Server {
 	server := &Server{
 		serverMux:     http.NewServeMux(),
 		config:        config,
@@ -24,13 +23,5 @@ func New(config *utils.Config, usecases usecase.Usecase, repositories repo.Repos
 		repositiories: repositories,
 	}
 	server.addRoutes()
-	return server
-}
-
-func (s *Server) StartServer() {
-	slog.Info("starting http server on", "url", s.config.ServerURL)
-	err := http.ListenAndServe(s.config.ServerURL, s.serverMux)
-	if err != nil {
-		slog.Error("server stopped", "err", err)
-	}
+	return &http.Server{Addr: config.ServerURL}
 }

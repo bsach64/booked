@@ -11,6 +11,48 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type NotificationStatus string
+
+const (
+	NotificationStatusToNotify NotificationStatus = "to_notify"
+	NotificationStatusNotified NotificationStatus = "notified"
+)
+
+func (e *NotificationStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = NotificationStatus(s)
+	case string:
+		*e = NotificationStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for NotificationStatus: %T", src)
+	}
+	return nil
+}
+
+type NullNotificationStatus struct {
+	NotificationStatus NotificationStatus
+	Valid              bool // Valid is true if NotificationStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullNotificationStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.NotificationStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.NotificationStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullNotificationStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.NotificationStatus), nil
+}
+
 type TicketStatus string
 
 const (
@@ -125,4 +167,14 @@ type User struct {
 	Role           UserRole
 	CreatedAt      pgtype.Timestamp
 	UpdatedAt      pgtype.Timestamp
+}
+
+type Waitlist struct {
+	ID        pgtype.UUID
+	Count     int32
+	UserID    pgtype.UUID
+	EventID   pgtype.UUID
+	Status    NotificationStatus
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }

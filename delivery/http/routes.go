@@ -33,4 +33,7 @@ func (s *Server) addRoutes() {
 	s.serverMux.Handle("GET /analytics/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.TotalBookingsHandler)))))
 	s.serverMux.Handle("GET /analytics/daily/bookings/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.DailyBookingsHandler)))))
 	s.serverMux.Handle("GET /analytics/cancellation_rates/", middlewares.JWTAuth(middlewares.SetUserInCtx(middlewares.Admin(http.HandlerFunc(coreHandler.CancellationRatesHandler)))))
+
+	// waitlist
+	s.serverMux.Handle("POST /waitlist/add/", middlewares.JWTAuth(middlewares.SetUserInCtx(http.HandlerFunc(coreHandler.AddWaitlistHandler))))
 }
