@@ -8,6 +8,16 @@
 
 ## Documentation
 
+### Major Design Decisions
+- The most important decision here was how to prevent double bookings. To solve this problem we have ticket bookings in two phases:
+  1. The user first reserves a ticket. We look for available (or cancelled) tickets in the DB and then "reserve" them in valkey by creating `<ticket_id>:<user_id>` pairs with a TTL (10 minutes).
+  2. The user then has to book the tickets within the TTL by calling /ticket/book/
+
+- The code base follows hexagonal architecture ![Hexagonal Architecture](https://netflixtechblog.com/ready-for-changes-with-hexagonal-architecture-b315ec967749)
+
+- I approached fault tolerance by failing gracefully in case of errors and ensuring the state in the DB remains correct.
+- The system is quite scalable and its performance can be further improved by caching some heavy GET apis such as those for getting events `GET /events/`. Further down the line some domains can be separated out into different microservices (such as those for analytics and waitlist background jobs)
+
 ### API Documentation
 #### Authentication
 - **JWT Bearer Token**: Most endpoints require authentication via JWT token in the Authorization header
