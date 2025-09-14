@@ -23,5 +23,5 @@ func New(config *utils.Config, usecases usecase.Usecase, repositories repo.Repos
 		repositiories: repositories,
 	}
 	server.addRoutes()
-	return &http.Server{Addr: ":"+config.ServerURL}
+	return &http.Server{Addr: config.ServerURL}
 }
