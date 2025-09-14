@@ -113,7 +113,7 @@ func (q *Queries) GetAvailableTickets(ctx context.Context, eventID pgtype.UUID) 
 }
 
 const getBookedTickets = `-- name: GetBookedTickets :many
-SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked'
+SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND (status = 'booked' OR status = 'cancelled')
 `
 
 type GetBookedTicketsParams struct {

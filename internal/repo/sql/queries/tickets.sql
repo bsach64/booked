@@ -31,7 +31,7 @@ WHERE
 GROUP BY events.id;
 
 -- name: GetBookedTickets :many
-SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked';
+SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND (status = 'booked' OR status = 'cancelled');
 
 -- name: CancelTickets :exec
 UPDATE tickets SET user_id = NULL, status = 'cancelled', updated_at = NOW() WHERE id = ANY($1::uuid[]);
