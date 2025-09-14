@@ -6,7 +6,7 @@ type Config struct {
 	DBUri     string `env:"DB_URI" envDefault:"postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"`
 	ValkeyURL string `env:"VALKEY_URL" envDefault:"redis://localhost:6379"`
 	JwtSecret string `env:"JWT_SECRET" envDefault:"verysecret"`
-	ServerURL string `env:"PORT" envDefault:"8080"`
+	ServerURL string `env:"PORT" envDefault:""`
 }
 
 func GetConfig() (*Config, error) {
