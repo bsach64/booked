@@ -49,3 +49,12 @@ GROUP BY
 ORDER BY
 	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION
 DESC;
+
+-- name: GetDailyBookings :many
+SELECT
+	event_id,
+	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::data = CURRENT_DATE) AS today_booked_tickets
+FROM
+	tickets
+GROUP BY
+	event_id;

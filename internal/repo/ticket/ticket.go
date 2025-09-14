@@ -271,6 +271,24 @@ func (i *impl) GetAnalytics(ctx context.Context) ([]*ticketdom.Analytics, error)
 	return response, nil
 }
 
+func (i *impl) GetDailyBookings(ctx context.Context) ([]*ticketdom.DailyAnalytics, error) {
+	response := []*ticketdom.DailyAnalytics{}
+	stats, err := i.queries.GetDailyBookings(ctx)
+	if err != nil {
+		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
+	}
+
+	for _, stat := range stats {
+		data := &ticketdom.DailyAnalytics{
+			EventID:          stat.EventID.String(),
+			TodaySoldTickets: int(stat.TodayBookedTickets),
+		}
+		response = append(response, data)
+	}
+	return response, nil
+
+}
+
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {
 	return &impl{
 		config:       config,

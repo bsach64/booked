@@ -17,3 +17,7 @@ func (c *CoreHandler) TotalBookingsHandler(w http.ResponseWriter, r *http.Reques
 
 	httputils.SendJson(w, http.StatusOK, nil, resp)
 }
+
+func (c *CoreHandler) DailyBookingsHandler(w http.ResponseWriter, r *http.Request) {
+
+}

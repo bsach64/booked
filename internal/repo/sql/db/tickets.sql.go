@@ -203,3 +203,38 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 	}
 	return items, nil
 }
+
+const getDailyBookings = `-- name: GetDailyBookings :many
+SELECT
+	event_id,
+	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::data = CURRENT_DATE) AS today_booked_tickets
+FROM
+	tickets
+GROUP BY
+	event_id
+`
+
+type GetDailyBookingsRow struct {
+	EventID            pgtype.UUID
+	TodayBookedTickets int64
+}
+
+func (q *Queries) GetDailyBookings(ctx context.Context) ([]GetDailyBookingsRow, error) {
+	rows, err := q.db.Query(ctx, getDailyBookings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDailyBookingsRow
+	for rows.Next() {
+		var i GetDailyBookingsRow
+		if err := rows.Scan(&i.EventID, &i.TodayBookedTickets); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

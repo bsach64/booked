@@ -56,6 +56,11 @@ type Analytics struct {
 	CapacityUtilisation float64 `json:"capacity_utilisation"`
 }
 
+type DailyAnalytics struct {
+	EventID          string `json:"event_id"`
+	TodaySoldTickets int    `json:"today_booked_tickets"`
+}
+
 type Usecase interface {
 	ReserveTickets(ctx context.Context, reserveTickets *ReserveTicketRequest) (*ReserveTicketsResponse, error)
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []string) error
@@ -71,4 +76,5 @@ type Repository interface {
 	CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid.UUID, count int) error
 	GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error)
 	GetAnalytics(ctx context.Context) ([]*Analytics, error)
+	GetDailyBookings(ctx context.Context) ([]*DailyAnalytics, error)
 }
