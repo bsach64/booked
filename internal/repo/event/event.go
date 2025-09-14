@@ -93,7 +93,11 @@ func (i *impl) DeleteEvent(ctx context.Context, eventID uuid.UUID) error {
 	if err == pgx.ErrNoRows {
 		return errordom.GetEventError(errordom.NO_EVENT_FOUND, "no event with given id", err)
 	}
-	return errordom.GetDBError(errordom.DB_WRITE_ERROR, "could not delete event", err)
+
+	if err != nil {
+		return errordom.GetDBError(errordom.DB_WRITE_ERROR, "could not delete event", err)
+	}
+	return nil
 }
 
 func (i *impl) UpdateEvent(ctx context.Context, Request *eventdom.UpdateEventRequest) error {
@@ -153,7 +157,10 @@ func (i *impl) UpdateEvent(ctx context.Context, Request *eventdom.UpdateEventReq
 		Params.Longitude = event.Longitude
 	}
 
-	if Request.SeatCount != nil && *Request.SeatCount > int(event.TotalTickets) {
+	if Request.SeatCount != nil {
+		if *Request.SeatCount < int(event.TotalTickets) {
+			return errordom.GetEventError(errordom.CANT_REDUCE_SEAT_COUNT, "cant reduce seat count", nil)
+		}
 		additionalSeats := *Request.SeatCount - int(event.TotalTickets)
 		var tickets []db.CreateTicketsParams
 

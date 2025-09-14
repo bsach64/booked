@@ -76,7 +76,7 @@ func (c *CoreHandler) CancelTickets(w http.ResponseWriter, r *http.Request) {
 
 	var cancelTicketRequest ticketdom.CancelTicketRequest
 	if err := json.NewDecoder(r.Body).Decode(&cancelTicketRequest); err != nil {
-		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "", err).(*errordom.AppError)
+		ae := errordom.GetSystemError(errordom.JSON_DECODE_ERROR, "could not decode json", err).(*errordom.AppError)
 		httputils.SendAppError(w, http.StatusBadRequest, nil, ae)
 		return
 	}

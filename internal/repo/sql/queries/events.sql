@@ -9,7 +9,7 @@ INSERT INTO events (
 SELECT
 	e.*,
 	COUNT(t.id) AS total_tickets,
-	COUNT(t.id) FILTER (WHERE t.status = 'available') AS available_tickets
+	COUNT(t.id) FILTER (WHERE t.status = 'available' OR t.status = 'cancelled') AS available_tickets
 FROM
 	events e
 JOIN

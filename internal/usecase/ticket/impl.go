@@ -23,7 +23,7 @@ func (i *impl) ReserveTickets(ctx context.Context, reserveTickets *ticketdom.Res
 	}
 
 	if reserveTickets.Count <= 0 {
-		return nil, errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "seat count is less than 0", err)
+		return nil, errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "seat count is less than/equal to 0", err)
 	}
 
 	ticketIDs, err := i.repositories.Ticket.ReserveTickets(ctx, reserveTickets.UserID, eventID, reserveTickets.Count)

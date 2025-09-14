@@ -71,6 +71,10 @@ func (i *impl) CreateEvent(ctx context.Context, eventRequest *eventdom.CreateEve
 		SeatCount:   eventRequest.SeatCount,
 	}
 
+	if eventRequest.Name == "" || eventRequest.Description == "" || eventRequest.Address == "" || eventRequest.UnixTime == 0 {
+		return errordom.GetEventError(errordom.INVALID_NEW_EVENT, "please provide valid event details", nil)
+	}
+
 	if eventRequest.SeatCount <= 0 {
 		return errordom.GetEventError(errordom.INVALID_SEAT_COUNT, "seat count less than 0", nil)
 	}

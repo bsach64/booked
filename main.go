@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -62,7 +63,7 @@ func main() {
 	}()
 
 	// Run background notify job
-	go BackgroundNotifyJob(ctx, usecases)
+	go BackgroundNotifyJob(ctx, usecases, config)
 
 	<-stop
 	slog.Info("shutting down...")
@@ -77,12 +78,19 @@ func main() {
 	}
 }
 
-func BackgroundNotifyJob(ctx context.Context, uc usecase.Usecase) {
+func BackgroundNotifyJob(ctx context.Context, uc usecase.Usecase, config *utils.Config) {
 	if err := uc.WaitlistUC.NotifyUsers(ctx); err != nil {
 		slog.Error("error while running notify job", "err", err)
+		return
 	}
 
-	ticker := time.NewTicker(10 * time.Minute)
+	timeInSeconds, err := strconv.Atoi(config.NotifyWaitlistInSeconds)
+	if err != nil {
+		slog.Error("could not parse notify time", "err", err)
+		return
+	}
+
+	ticker := time.NewTicker(time.Duration(timeInSeconds) * time.Second)
 	defer ticker.Stop()
 
 	for {

@@ -39,43 +39,19 @@ type CreateTicketsParams struct {
 	EventID pgtype.UUID
 }
 
-const getAllTickets = `-- name: GetAllTickets :many
-SELECT id FROM tickets WHERE event_id = $1
-`
-
-func (q *Queries) GetAllTickets(ctx context.Context, eventID pgtype.UUID) ([]pgtype.UUID, error) {
-	rows, err := q.db.Query(ctx, getAllTickets, eventID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []pgtype.UUID
-	for rows.Next() {
-		var id pgtype.UUID
-		if err := rows.Scan(&id); err != nil {
-			return nil, err
-		}
-		items = append(items, id)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getAnalytics = `-- name: GetAnalytics :many
 SELECT
 	event_id,
 	COUNT(id) AS total_seats,
 	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets,
-	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation
+	(COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION / NULLIF(COUNT(id), 0)::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation,
+	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::date = CURRENT_DATE) AS today_booked_tickets
 FROM
 	tickets
 GROUP BY
 	event_id
 ORDER BY
-	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION
-DESC
+	capacity_utilisation DESC NULLS LAST
 `
 
 type GetAnalyticsRow struct {
@@ -83,6 +59,7 @@ type GetAnalyticsRow struct {
 	TotalSeats          int64
 	BookedTickets       int64
 	CapacityUtilisation float64
+	TodayBookedTickets  int64
 }
 
 func (q *Queries) GetAnalytics(ctx context.Context) ([]GetAnalyticsRow, error) {
@@ -99,6 +76,7 @@ func (q *Queries) GetAnalytics(ctx context.Context) ([]GetAnalyticsRow, error) {
 			&i.TotalSeats,
 			&i.BookedTickets,
 			&i.CapacityUtilisation,
+			&i.TodayBookedTickets,
 		); err != nil {
 			return nil, err
 		}
@@ -231,13 +209,16 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 const getCancellationRates = `-- name: GetCancellationRates :many
 SELECT
 	event_id,
-	(
-		COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
-		/
-		NULLIF(
-			COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
-			0
-		)
+	COALESCE(
+		(
+			COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
+			/
+			NULLIF(
+				COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
+				0
+			)
+		),
+		0
 	)::DOUBLE PRECISION AS cancellation_rate
 FROM
 	tickets
@@ -260,41 +241,6 @@ func (q *Queries) GetCancellationRates(ctx context.Context) ([]GetCancellationRa
 	for rows.Next() {
 		var i GetCancellationRatesRow
 		if err := rows.Scan(&i.EventID, &i.CancellationRate); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getDailyBookings = `-- name: GetDailyBookings :many
-SELECT
-	event_id,
-	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::date = CURRENT_DATE) AS today_booked_tickets
-FROM
-	tickets
-GROUP BY
-	event_id
-`
-
-type GetDailyBookingsRow struct {
-	EventID            pgtype.UUID
-	TodayBookedTickets int64
-}
-
-func (q *Queries) GetDailyBookings(ctx context.Context) ([]GetDailyBookingsRow, error) {
-	rows, err := q.db.Query(ctx, getDailyBookings)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetDailyBookingsRow
-	for rows.Next() {
-		var i GetDailyBookingsRow
-		if err := rows.Scan(&i.EventID, &i.TodayBookedTickets); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

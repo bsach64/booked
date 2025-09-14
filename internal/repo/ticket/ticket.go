@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"strconv"
 
@@ -102,7 +103,7 @@ func (i *impl) ReserveTickets(ctx context.Context, userID uuid.UUID, eventID uui
 
 	script := valkey.NewLuaScript(luaScript)
 
-	reservedTickets, err := script.Exec(ctx, i.valkeyClient, dbTicketIDStrs, []string{userID.String(), "600", strconv.Itoa(count)}).ToArray()
+	reservedTickets, err := script.Exec(ctx, i.valkeyClient, dbTicketIDStrs, []string{userID.String(), i.config.ReserveTimeInSeconds, strconv.Itoa(count)}).ToArray()
 	if err != nil {
 		return nil, errordom.GetDBError(errordom.DB_TX_ERROR, "failed to reserve tickets", err)
 	}
@@ -172,6 +173,11 @@ func (i *impl) BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []uu
 	err = tx.Commit(ctx)
 	if err != nil {
 		return errordom.GetDBError(errordom.DB_TX_ERROR, "failed to commit tx", err)
+	}
+
+	// deleted them from cache when booked
+	for _, ticket := range ticketIDs {
+		_, _ = i.valkeyClient.Do(ctx, i.valkeyClient.B().Del().Key(ticket.String()).Build()).ToString()
 	}
 	return nil
 }
@@ -256,6 +262,7 @@ func (i *impl) GetAnalytics(ctx context.Context) ([]*ticketdom.Analytics, error)
 	response := []*ticketdom.Analytics{}
 	stats, err := i.queries.GetAnalytics(ctx)
 	if err != nil {
+		slog.Error("could not get analytics", "err", err)
 		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
 	}
 
@@ -265,23 +272,7 @@ func (i *impl) GetAnalytics(ctx context.Context) ([]*ticketdom.Analytics, error)
 			TotalSeats:          int(stat.TotalSeats),
 			SoldTickets:         int(stat.BookedTickets),
 			CapacityUtilisation: float64(stat.BookedTickets) / float64(stat.TotalSeats),
-		}
-		response = append(response, data)
-	}
-	return response, nil
-}
-
-func (i *impl) GetDailyBookings(ctx context.Context) ([]*ticketdom.DailyAnalytics, error) {
-	response := []*ticketdom.DailyAnalytics{}
-	stats, err := i.queries.GetDailyBookings(ctx)
-	if err != nil {
-		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
-	}
-
-	for _, stat := range stats {
-		data := &ticketdom.DailyAnalytics{
-			EventID:          stat.EventID.String(),
-			TodaySoldTickets: int(stat.TodayBookedTickets),
+			TodaySoldTickets:    int(stat.TodayBookedTickets),
 		}
 		response = append(response, data)
 	}

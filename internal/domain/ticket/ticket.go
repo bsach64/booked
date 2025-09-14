@@ -54,11 +54,7 @@ type Analytics struct {
 	TotalSeats          int     `json:"total_seats"`
 	SoldTickets         int     `json:"sold_tickets"`
 	CapacityUtilisation float64 `json:"capacity_utilisation"`
-}
-
-type DailyAnalytics struct {
-	EventID          string `json:"event_id"`
-	TodaySoldTickets int    `json:"today_booked_tickets"`
+	TodaySoldTickets    int     `json:"today_booked_tickets"`
 }
 
 type CancellationRates struct {
@@ -82,6 +78,5 @@ type Repository interface {
 	GetAvailableTickets(ctx context.Context, eventID uuid.UUID) (int, error)
 	GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error)
 	GetAnalytics(ctx context.Context) ([]*Analytics, error)
-	GetDailyBookings(ctx context.Context) ([]*DailyAnalytics, error)
 	GetCancellationRates(ctx context.Context) ([]*CancellationRates, error)
 }

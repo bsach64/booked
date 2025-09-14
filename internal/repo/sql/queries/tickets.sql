@@ -41,34 +41,28 @@ SELECT
 	event_id,
 	COUNT(id) AS total_seats,
 	COUNT(id) FILTER (WHERE status = 'booked') AS booked_tickets,
-	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation
+	(COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION / NULLIF(COUNT(id), 0)::DOUBLE PRECISION)::DOUBLE PRECISION AS capacity_utilisation,
+	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::date = CURRENT_DATE) AS today_booked_tickets
 FROM
 	tickets
 GROUP BY
 	event_id
 ORDER BY
-	(COUNT(id)::DOUBLE PRECISION / COUNT(id) FILTER (WHERE status = 'booked')::DOUBLE PRECISION)::DOUBLE PRECISION
-DESC;
-
--- name: GetDailyBookings :many
-SELECT
-	event_id,
-	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::date = CURRENT_DATE) AS today_booked_tickets
-FROM
-	tickets
-GROUP BY
-	event_id;
+	capacity_utilisation DESC NULLS LAST;
 
 -- name: GetCancellationRates :many
 SELECT
 	event_id,
-	(
-		COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
-		/
-		NULLIF(
-			COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
-			0
-		)
+	COALESCE(
+		(
+			COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
+			/
+			NULLIF(
+				COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
+				0
+			)
+		),
+		0
 	)::DOUBLE PRECISION AS cancellation_rate
 FROM
 	tickets

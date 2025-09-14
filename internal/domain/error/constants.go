@@ -34,9 +34,11 @@ const (
 	INVALID_UUID      ErrorCategoryCode = "03"
 
 	// Event
-	INVALID_SEAT_COUNT ErrorCategoryCode = "01"
-	INVALID_EVENT_ID   ErrorCategoryCode = "02"
-	NO_EVENT_FOUND     ErrorCategoryCode = "03"
+	INVALID_SEAT_COUNT     ErrorCategoryCode = "01"
+	INVALID_EVENT_ID       ErrorCategoryCode = "02"
+	NO_EVENT_FOUND         ErrorCategoryCode = "03"
+	INVALID_NEW_EVENT      ErrorCategoryCode = "04"
+	CANT_REDUCE_SEAT_COUNT ErrorCategoryCode = "05"
 
 	// Ticket
 	TOO_FEW_TICKETS     ErrorCategoryCode = "01"

@@ -32,7 +32,6 @@ func SendAppError(w http.ResponseWriter, status int, headers map[string]string, 
 		Category:     string(errordom.CATEGORY_SYSTEM),
 		CategoryCode: string(errordom.UNKNOWN_ERROR),
 		Msg:          "an unknowned error occurred, please try again later",
-		Error:        err,
 	}
 
 	if err != nil {
@@ -41,9 +40,8 @@ func SendAppError(w http.ResponseWriter, status int, headers map[string]string, 
 			errRes.Category = string(ae.Category)
 			errRes.CategoryCode = string(ae.CategoryCode)
 			errRes.Msg = ae.Msg
-			if ae.ErrorToWrap != nil {
-				errRes.Error = ae.ErrorToWrap
-			}
+		} else {
+			errRes.Error = err
 		}
 	}
 

@@ -103,7 +103,7 @@ const getEvents = `-- name: GetEvents :many
 SELECT
 	e.id, e.name, e.time, e.address, e.description, e.latitude, e.longitude, e.created_at, e.updated_at,
 	COUNT(t.id) AS total_tickets,
-	COUNT(t.id) FILTER (WHERE t.status = 'available') AS available_tickets
+	COUNT(t.id) FILTER (WHERE t.status = 'available' OR t.status = 'cancelled') AS available_tickets
 FROM
 	events e
 JOIN

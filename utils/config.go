@@ -3,10 +3,12 @@ package utils
 import "github.com/caarlos0/env/v11"
 
 type Config struct {
-	DBUri     string `env:"DB_URI" envDefault:"postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"`
-	ValkeyURL string `env:"VALKEY_URL" envDefault:"redis://localhost:6379"`
-	JwtSecret string `env:"JWT_SECRET" envDefault:"verysecret"`
-	ServerURL string `env:"SERVER_URL" envDefault:"localhost:8080"`
+	DBUri                   string `env:"DB_URI" envDefault:"postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"`
+	ValkeyURL               string `env:"VALKEY_URL" envDefault:"redis://localhost:6379"`
+	JwtSecret               string `env:"JWT_SECRET" envDefault:"verysecret"`
+	ServerURL               string `env:"SERVER_URL" envDefault:"localhost:8080"`
+	ReserveTimeInSeconds    string `env:"RESERVE_TIME_IN_SECONDS" envDefault:"600"`
+	NotifyWaitlistInSeconds string `env:"NOTIFY_WAITLIST_TIME_IN_SECONDS" envDefault:"600"`
 }
 
 func GetConfig() (*Config, error) {
