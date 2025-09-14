@@ -243,19 +243,25 @@ func (i *impl) CancelTickets(ctx context.Context, userID uuid.UUID, eventID uuid
 func (i *impl) GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error) {
 	dbTicketIDs, err := i.queries.GetAvailableTickets(ctx, pgtype.UUID{Bytes: eventID, Valid: true})
 	if err != nil {
+		slog.Error("got this error here", "err", err)
 		return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get available tickets", err)
 	}
 
-	idStrs := []string{}
+	count := 0
 	for _, id := range dbTicketIDs {
-		idStrs = append(idStrs, id.String())
+		exists, err := i.valkeyClient.Do(ctx, i.valkeyClient.B().Exists().Key(id.String()).Build()).AsBool()
+		if err != nil {
+			if errors.Is(err, valkey.Nil) {
+				return 0, nil
+			}
+			return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get reserved ticket count", err)
+		}
+		if exists {
+			count++
+		}
 	}
 
-	count, err := i.valkeyClient.Do(ctx, i.valkeyClient.B().Exists().Key(idStrs...).Build()).AsInt64()
-	if err != nil {
-		return 0, errordom.GetDBError(errordom.DB_READ_ERROR, "could not get reserved ticket count", err)
-	}
-	return int(count), nil
+	return count, nil
 }
 
 func (i *impl) GetAnalytics(ctx context.Context) ([]*ticketdom.Analytics, error) {
