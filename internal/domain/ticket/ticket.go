@@ -61,6 +61,11 @@ type DailyAnalytics struct {
 	TodaySoldTickets int    `json:"today_booked_tickets"`
 }
 
+type CancellationRates struct {
+	EventID          string  `json:"event_id"`
+	CancellationRate float64 `json:"cancellation_rate"`
+}
+
 type Usecase interface {
 	ReserveTickets(ctx context.Context, reserveTickets *ReserveTicketRequest) (*ReserveTicketsResponse, error)
 	BookTickets(ctx context.Context, userID uuid.UUID, ticketIDs []string) error
@@ -77,4 +82,5 @@ type Repository interface {
 	GetReservedTickets(ctx context.Context, eventID uuid.UUID) (int, error)
 	GetAnalytics(ctx context.Context) ([]*Analytics, error)
 	GetDailyBookings(ctx context.Context) ([]*DailyAnalytics, error)
+	GetCancellationRates(ctx context.Context) ([]*CancellationRates, error)
 }

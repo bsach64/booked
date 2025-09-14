@@ -3,7 +3,7 @@ INSERT INTO tickets (id, event_id)
 VALUES ($1, $2);
 
 -- name: GetAvailableTickets :many
-SELECT id FROM tickets WHERE event_id = $1 AND status = 'available';
+SELECT id FROM tickets WHERE event_id = $1 AND (status = 'available' OR status = 'cancelled');
 
 -- name: BookTickets :exec
 UPDATE tickets SET user_id = $1, status = 'booked', updated_at = NOW() WHERE id = ANY($2::uuid[]);
@@ -34,7 +34,7 @@ GROUP BY events.id;
 SELECT id FROM tickets WHERE event_id = $1 AND user_id = $2 AND status = 'booked';
 
 -- name: CancelTickets :exec
-UPDATE tickets SET user_id = NULL, status = 'available', updated_at = NOW() WHERE id = ANY($1::uuid[]);
+UPDATE tickets SET user_id = NULL, status = 'cancelled', updated_at = NOW() WHERE id = ANY($1::uuid[]);
 
 -- name: GetAnalytics :many
 SELECT
@@ -54,6 +54,22 @@ DESC;
 SELECT
 	event_id,
 	COUNT(id) FILTER (WHERE status = 'booked' AND updated_at::data = CURRENT_DATE) AS today_booked_tickets
+FROM
+	tickets
+GROUP BY
+	event_id;
+
+-- name: GetCancellationRates :many
+SELECT
+	event_id,
+	(
+		COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
+		/
+		NULLIF(
+			COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
+			0
+		)
+	)::DOUBLE PRECISION AS cancellation_rate
 FROM
 	tickets
 GROUP BY

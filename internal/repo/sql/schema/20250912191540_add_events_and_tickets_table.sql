@@ -12,7 +12,7 @@ CREATE TABLE events (
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE ticket_status AS ENUM ('available', 'booked');
+CREATE TYPE ticket_status AS ENUM ('available', 'booked', 'cancelled');
 
 CREATE TABLE tickets (
 	id UUID PRIMARY KEY,

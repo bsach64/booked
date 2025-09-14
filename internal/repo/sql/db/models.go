@@ -16,6 +16,7 @@ type TicketStatus string
 const (
 	TicketStatusAvailable TicketStatus = "available"
 	TicketStatusBooked    TicketStatus = "booked"
+	TicketStatusCancelled TicketStatus = "cancelled"
 )
 
 func (e *TicketStatus) Scan(src interface{}) error {

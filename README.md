@@ -31,7 +31,7 @@ doing things
 - [x] Total Number of tickets booked by event.
 
 **Most Popular Events**
-- [ ] Most Popular events
+- [x] Most Popular events
 
 **Capacity Utilisation**
 - [x] Capacity Utilisation
@@ -39,6 +39,7 @@ doing things
 **Code Quality**
 - [ ] Graceful Shutdown of server
 - [ ] Check all edge cases
+- [ ] event_name in all analytics
 
 Problem Statement
     - Design and build a scalable backend system that supports the following:

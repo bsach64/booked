@@ -26,7 +26,7 @@ func (q *Queries) BookTickets(ctx context.Context, arg BookTicketsParams) error 
 }
 
 const cancelTickets = `-- name: CancelTickets :exec
-UPDATE tickets SET user_id = NULL, status = 'available', updated_at = NOW() WHERE id = ANY($1::uuid[])
+UPDATE tickets SET user_id = NULL, status = 'cancelled', updated_at = NOW() WHERE id = ANY($1::uuid[])
 `
 
 func (q *Queries) CancelTickets(ctx context.Context, dollar_1 []pgtype.UUID) error {
@@ -87,7 +87,7 @@ func (q *Queries) GetAnalytics(ctx context.Context) ([]GetAnalyticsRow, error) {
 }
 
 const getAvailableTickets = `-- name: GetAvailableTickets :many
-SELECT id FROM tickets WHERE event_id = $1 AND status = 'available'
+SELECT id FROM tickets WHERE event_id = $1 AND (status = 'available' OR status = 'cancelled')
 `
 
 func (q *Queries) GetAvailableTickets(ctx context.Context, eventID pgtype.UUID) ([]pgtype.UUID, error) {
@@ -194,6 +194,48 @@ func (q *Queries) GetBookingHistory(ctx context.Context, userID pgtype.UUID) ([]
 			&i.Count,
 			&i.Column9,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCancellationRates = `-- name: GetCancellationRates :many
+SELECT
+	event_id,
+	(
+		COUNT(id) FILTER (WHERE status = 'cancelled')::DOUBLE PRECISION
+		/
+		NULLIF(
+			COUNT(id) FILTER (WHERE status = 'booked' OR status = 'cancelled')::DOUBLE PRECISION,
+			0
+		)
+	)::DOUBLE PRECISION AS cancellation_rate
+FROM
+	tickets
+GROUP BY
+	event_id
+`
+
+type GetCancellationRatesRow struct {
+	EventID          pgtype.UUID
+	CancellationRate float64
+}
+
+func (q *Queries) GetCancellationRates(ctx context.Context) ([]GetCancellationRatesRow, error) {
+	rows, err := q.db.Query(ctx, getCancellationRates)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCancellationRatesRow
+	for rows.Next() {
+		var i GetCancellationRatesRow
+		if err := rows.Scan(&i.EventID, &i.CancellationRate); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

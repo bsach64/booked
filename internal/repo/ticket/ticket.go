@@ -286,7 +286,23 @@ func (i *impl) GetDailyBookings(ctx context.Context) ([]*ticketdom.DailyAnalytic
 		response = append(response, data)
 	}
 	return response, nil
+}
 
+func (i *impl) GetCancellationRates(ctx context.Context) ([]*ticketdom.CancellationRates, error) {
+	response := []*ticketdom.CancellationRates{}
+	stats, err := i.queries.GetCancellationRates(ctx)
+	if err != nil {
+		return nil, errordom.GetDBError(errordom.DB_READ_ERROR, "could not read tickets table", err)
+	}
+
+	for _, stat := range stats {
+		data := &ticketdom.CancellationRates{
+			EventID:          stat.EventID.String(),
+			CancellationRate: stat.CancellationRate,
+		}
+		response = append(response, data)
+	}
+	return response, nil
 }
 
 func New(config *utils.Config, queries *db.Queries, dbConn *pgxpool.Pool, valkeyClient valkey.Client) ticketdom.Repository {
