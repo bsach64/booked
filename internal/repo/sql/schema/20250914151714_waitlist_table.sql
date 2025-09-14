@@ -16,5 +16,6 @@ CREATE TABLE waitlist (
 
 -- +goose Down
 DROP TABLE waitlist;
+DROP TYPE notification_status;
 -- +goose StatementBegin
 -- +goose StatementEnd
