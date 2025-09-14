@@ -6,30 +6,15 @@
 ## ER Diagram
 ![Alt text](erdiagram.png)
 
-## Overview
+## Documentation
 
-Booked is a comprehensive event ticket booking system built with Go. It provides APIs for user management, event management, ticket booking, analytics, and waitlist functionality.
-
-## Features
-
-- **User Management**: Registration, authentication, and booking history
-- **Event Management**: Create, read, update, and delete events (admin only)
-- **Ticket Management**: Reserve, book, and cancel tickets
-- **Analytics**: Booking statistics and cancellation rates (admin only)
-- **Waitlist**: Join event waitlists when tickets are sold out
-- **JWT Authentication**: Secure API access with role-based permissions
-
-## API Documentation
-
-### Base URL
-The API runs on the server URL configured in the application (typically `localhost:8080` or similar).
-
-### Authentication
+### API Documentation
+#### Authentication
 - **JWT Bearer Token**: Most endpoints require authentication via JWT token in the Authorization header
 - **Format**: `Authorization: Bearer <jwt_token>`
 - **Admin Role**: Some endpoints require admin privileges
 
-### Error Response Format
+#### Error Response Format
 All errors follow this structure:
 ```json
 {
@@ -42,9 +27,9 @@ All errors follow this structure:
 
 ---
 
-## 1. Health Check
+### 1. Health Check
 
-### GET /health/
+#### GET /health/
 **Description**: Health check endpoint  
 **Authentication**: None required  
 **Request**: No body  
@@ -59,9 +44,9 @@ All errors follow this structure:
 
 ---
 
-## 2. User Management
+### 2. User Management
 
-### POST /user/register/
+#### POST /user/register/
 **Description**: Register a new user  
 **Authentication**: None required  
 **Request Body**:
@@ -84,7 +69,7 @@ All errors follow this structure:
 - `USER-08` - Empty name
 - `USER-02` - Empty password
 
-### POST /user/login/
+#### POST /user/login/
 **Description**: Login user and get JWT token  
 **Authentication**: None required  
 **Request Body**:
@@ -111,7 +96,7 @@ All errors follow this structure:
 - `USER-03` - User not found
 - `USER-04` - Invalid password
 
-### GET /user/bookings/
+#### GET /user/bookings/
 **Description**: Get user's past bookings  
 **Authentication**: JWT required  
 **Request**: No body  
@@ -138,9 +123,9 @@ All errors follow this structure:
 
 ---
 
-## 3. Event Management
+### 3. Event Management
 
-### POST /event/
+#### POST /event/
 **Description**: Create a new event (Admin only)  
 **Authentication**: JWT + Admin role required  
 **Request Body**:
@@ -167,7 +152,7 @@ All errors follow this structure:
 - `EVENT-01` - Invalid seat count
 - `EVENT-04` - Invalid new event data
 
-### GET /event/
+#### GET /event/?limit=XX?timestamp=XXX
 **Description**: Get paginated list of events  
 **Authentication**: None required  
 **Query Parameters**:
@@ -197,7 +182,7 @@ All errors follow this structure:
 - 200 OK - Events retrieved successfully
 - 500 Internal Server Error - System error
 
-### DELETE /event/
+#### DELETE /event/
 **Description**: Delete an event (Admin only)  
 **Authentication**: JWT + Admin role required  
 **Query Parameters**:
@@ -213,7 +198,7 @@ All errors follow this structure:
 **Possible Errors**:
 - `EVENT-03` - No event found
 
-### POST /event/update/
+#### POST /event/update/
 **Description**: Update an event (Admin only)  
 **Authentication**: JWT + Admin role required  
 **Request Body**:
@@ -242,9 +227,9 @@ All errors follow this structure:
 
 ---
 
-## 4. Ticket Management
+### 4. Ticket Management
 
-### POST /ticket/reserve/
+#### POST /ticket/reserve/
 **Description**: Reserve tickets for an event  
 **Authentication**: JWT required  
 **Request Body**:
@@ -270,7 +255,7 @@ All errors follow this structure:
 - `SYS-01` - JSON decode error
 - `SYS-03` - Invalid UUID
 
-### POST /ticket/book/
+#### POST /ticket/book/
 **Description**: Book previously reserved tickets  
 **Authentication**: JWT required  
 **Request Body**:
@@ -290,7 +275,7 @@ All errors follow this structure:
 - `SYS-01` - JSON decode error
 - `TICKET-02` - Ticket not reserved
 
-### POST /ticket/cancel/
+#### POST /ticket/cancel/
 **Description**: Cancel booked tickets  
 **Authentication**: JWT required  
 **Request Body**:
@@ -315,10 +300,10 @@ All errors follow this structure:
 
 ---
 
-## 5. Analytics (Admin Only)
+### 5. Analytics (Admin Only)
 
-### GET /analytics/
-**Description**: Get total bookings analytics for all events  
+#### GET /analytics/
+**Description**: Get total bookings analytics for all events, includes analytics like the number of tickets booked today and the capacity utilisation of the venue, the list is sorted by capacity utilsation (decreasing) indicating the most popular events.
 **Authentication**: JWT + Admin role required  
 **Request**: No body  
 **Response**:
@@ -338,7 +323,7 @@ All errors follow this structure:
 - 401 Unauthorized - Invalid token or not admin
 - 500 Internal Server Error - System error
 
-### GET /analytics/cancellation_rates/
+#### GET /analytics/cancellation_rates/
 **Description**: Get cancellation rates for all events  
 **Authentication**: JWT + Admin role required  
 **Request**: No body  
@@ -358,9 +343,9 @@ All errors follow this structure:
 
 ---
 
-## 6. Waitlist Management
+### 6. Waitlist Management
 
-### POST /waitlist/add/
+#### POST /waitlist/add/
 **Description**: Add user to event waitlist  
 **Authentication**: JWT required  
 **Request Body**:
@@ -385,14 +370,14 @@ All errors follow this structure:
 
 ---
 
-## Error Categories and Codes
+### Error Categories and Codes
 
-### System Errors (SYS)
+#### System Errors (SYS)
 - `SYS-01` - JSON decode error
 - `SYS-02` - Unknown error
 - `SYS-03` - Invalid UUID
 
-### User Errors (USER)
+#### User Errors (USER)
 - `USER-01` - Invalid user role
 - `USER-02` - Empty password
 - `USER-03` - User not found
@@ -402,23 +387,23 @@ All errors follow this structure:
 - `USER-07` - Empty email
 - `USER-08` - Empty name
 
-### Event Errors (EVENT)
+#### Event Errors (EVENT)
 - `EVENT-01` - Invalid seat count
 - `EVENT-02` - Invalid event ID
 - `EVENT-03` - No event found
 - `EVENT-04` - Invalid new event
 - `EVENT-05` - Can't reduce seat count
 
-### Ticket Errors (TICKET)
+#### Ticket Errors (TICKET)
 - `TICKET-01` - Too few tickets
 - `TICKET-02` - Ticket not reserved
 - `TICKET-03` - Not your ticket
 
-### Waitlist Errors (WAITLIST)
+#### Waitlist Errors (WAITLIST)
 - `WAITLIST-01` - Already in waitlist
 - `WAITLIST-02` - Invalid waitlist count
 
-### Database Errors (DB)
+#### Database Errors (DB)
 - `DB-01` - Database read error
 - `DB-02` - Database write error
 - `DB-03` - Database transaction error
