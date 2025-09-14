@@ -15,8 +15,15 @@
 
 - The code base follows hexagonal architecture [Hexagonal Architecture](https://netflixtechblog.com/ready-for-changes-with-hexagonal-architecture-b315ec967749)
 
-- I approached fault tolerance by failing gracefully in case of errors and ensuring the state in the DB remains correct.
-- The system is quite scalable and its performance can be further improved by caching some heavy GET apis such as those for getting events `GET /events/`. Further down the line some domains can be separated out into different microservices (such as those for analytics and waitlist background jobs)
+- Fault Tolerance is ensured by:
+  1. Failing Gracefully in case of errors, keeping the state in the DB correct.
+  2. Used transactions to ensure that the state of the DB does not change between queries.
+
+- Ensured the systems scalablity by doing the following things:
+  1. I have applied indexes to speed up high priority queries.
+  2. This monolith can be easily split up into microservices in the future.
+  3. Its perfomance can be further improved by caching some heavy GET apis in valkey.
+
 
 ### API Documentation
 #### Authentication
