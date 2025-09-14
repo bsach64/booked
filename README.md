@@ -1,5 +1,9 @@
 # Booked - Event Ticket Booking System
 
+## Architecture Diagram
+![Alt text](architecture.png)
+
+## ER Diagram
 ![Alt text](erdiagram.png)
 
 ## Overview
