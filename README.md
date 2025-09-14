@@ -303,7 +303,7 @@ All errors follow this structure:
 ### 5. Analytics (Admin Only)
 
 #### GET /analytics/
-**Description**: Get total bookings analytics for all events, includes analytics like the number of tickets booked today and the capacity utilisation of the venue, the list is sorted by capacity utilsation (decreasing) indicating the most popular events.
+**Description**: Get total bookings analytics for all events, includes analytics like the number of tickets booked today and the capacity utilisation of the venue, the list is sorted by capacity utilsation (decreasing) indicating the most popular events. \
 **Authentication**: JWT + Admin role required  
 **Request**: No body  
 **Response**:
